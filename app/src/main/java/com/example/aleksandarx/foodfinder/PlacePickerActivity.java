@@ -8,6 +8,7 @@ import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -65,17 +66,21 @@ public class PlacePickerActivity extends AppCompatActivity {
                 && resultCode == Activity.RESULT_OK) {
 
             final Place place = PlacePicker.getPlace(this, data);
-            final CharSequence name = place.getName();
-            final CharSequence address = place.getAddress();
-            String attributions = (String) place.getAttributions();
-            if (attributions == null) {
-                attributions = "";
+            if(place.getPlaceTypes().contains(Place.TYPE_FOOD)){
+                final CharSequence name = place.getName();
+                final CharSequence address = place.getAddress();
+                String attributions = (String) place.getAttributions();
+                if (attributions == null) {
+                    attributions = "";
+                }
+
+                mName.setText(name);
+                mAddress.setText(address);
+                mAttributions.setText(Html.fromHtml(attributions));
             }
-
-            mName.setText(name);
-            mAddress.setText(address);
-            mAttributions.setText(Html.fromHtml(attributions));
-
+            else{
+                Toast.makeText(this, "This is not FOOD place", Toast.LENGTH_SHORT).show();
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,10 +32,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.aleksandarx.foodfinder.network.HttpHelper;
+import com.example.aleksandarx.foodfinder.share.UserPreferences;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -81,19 +84,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private Context context;
     private Handler guiThred;
 
+    private void startMainActivity(){
+        Intent i = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(i);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         guiThred = new Handler();
         context =  this;
-        avatarButton = (Button) findViewById(R.id.choose_avatar_button);
+        /*avatarButton = (Button) findViewById(R.id.choose_avatar_button);
         avatarButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 pickImage();
             }
-        });
+        });*/
+
+
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -121,6 +131,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        if(!UserPreferences.getPreference(LoginActivity.this, UserPreferences.USER_USERNAME).isEmpty())
+            startMainActivity();
     }
 
     public void pickImage() {
@@ -302,12 +315,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        //return email.contains("@");
+        return true;
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        //return password.length() > 4;
+        return true;
     }
 
     /**
@@ -420,15 +435,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             try {
                 // Simulate network access.
-                String result = HttpHelper.loginHeroku(mEmail,mPassword);
-                if(result == "Succesfull")
-                {
-                    return true;
-                }
-                else{
+                if(HttpHelper.loginHeroku(mEmail, mPassword))
+                    UserPreferences.setPreference(LoginActivity.this, UserPreferences.USER_USERNAME, mEmail);
+                else
                     return false;
-                }
-                //Thread.sleep(2000);
             } catch (Exception e) {
                 return false;
             }
@@ -442,7 +452,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }*/
 
             // TODO: register the new account here.
-            //return true;
+            return true;
         }
 
         @Override
@@ -451,6 +461,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
+                startMainActivity();
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

@@ -1,5 +1,10 @@
 package com.example.aleksandarx.foodfinder.network;
 
+import android.util.Log;
+
+import com.example.aleksandarx.foodfinder.LoginActivity;
+import com.example.aleksandarx.foodfinder.share.UserPreferences;
+
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -82,65 +87,35 @@ public class HttpHelper {
 
     }
 
-    public static String loginHeroku(String username,String password)
+    public static boolean loginHeroku(String username, String password)
     {
-        String retStr = "";
         HttpURLConnection conn = null;
+        boolean ret = false;
         try {
+            conn = SetupConnection("http://food-finder-app.herokuapp.com/signinMobile",10000,15000,"POST","application/json; charset=UTF-8","application/json");
 
-            conn = SetupConnection("http://food-finder-app.herokuapp.com/",10000,15000,"POST","application/json; charset=UTF-8","application/json");
-
-            //JSONObject holder = new JSONObject();
             JSONObject data = new JSONObject();
-            data.put("Username", username);
-            data.put("Password", password);
+            data.put("username", username);
+            data.put("password", password);
 
-
-            /*Uri.Builder builder = new Uri.Builder()
-                    //.appendQueryParameter("req", SEND_MY_PLACE)
-                    //.appendQueryParameter("name", "ime")
-                    .appendQueryParameter("payload", data.toString());
-            String query = builder.build().getEncodedQuery();*/
-
-            OutputStreamWriter wr= new OutputStreamWriter(conn.getOutputStream());
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 
             wr.write(data.toString());
             wr.close();
 
-            /*OutputStream os = conn.getOutputStream();
-            os.write(data.toString().getBytes("UTF-8"));
-            os.close();
-            OutputStreamWriter wr= new OutputStreamWriter(os);
-            wr.write(data.toString());*/
-            /*BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            writer.write(data.toString());
-            writer.flush();
-            writer.close();
-            os.close();*/
+
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK){
-                retStr = inputStreamToString(conn.getInputStream());
-
+                ret = true;
             }
-            else{
-                retStr = String.valueOf("Error "+responseCode+" Data sent:"+data.toString());
-            }
-            //conn.connect();
-
-
-
-            conn.disconnect();
-            return retStr;
 
         } catch (Exception e) {
             e.printStackTrace();
-            //conn.disconnect();
-
-            return "Exception:"+e.getMessage()+"\n URL:";
         }finally {
             if(conn != null)
                 conn.disconnect();
         }
+        return ret;
     }
 
 
