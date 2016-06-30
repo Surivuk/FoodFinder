@@ -24,4 +24,10 @@ public class UserPreferences {
         SharedPreferences sharedpreferences = activityContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
         return sharedpreferences.getString(key, PREFERENCE_DEFAULT_ERROR);
     }
+
+    public static void removePreference(Context activityContext, String key){
+        SharedPreferences sharedpreferences = activityContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.remove(key);
+    }
 }

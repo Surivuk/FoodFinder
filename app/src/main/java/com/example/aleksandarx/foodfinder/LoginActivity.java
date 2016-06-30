@@ -132,8 +132,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        if(!UserPreferences.getPreference(LoginActivity.this, UserPreferences.USER_USERNAME).isEmpty())
+
+        if(!UserPreferences.getPreference(LoginActivity.this, UserPreferences.USER_USERNAME).equals(UserPreferences.PREFERENCE_DEFAULT_ERROR)) {
             startMainActivity();
+            finish();
+        }
     }
 
     public void pickImage() {

@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
                 return true;
             case R.id.menu_sign_out:
-                UserPreferences.setPreference(MainActivity.this, UserPreferences.USER_USERNAME, "");
+                UserPreferences.removePreference(MainActivity.this, UserPreferences.USER_USERNAME);
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 return true;
             default:
