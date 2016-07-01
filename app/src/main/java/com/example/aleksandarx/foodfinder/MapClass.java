@@ -52,7 +52,7 @@ public class MapClass implements OnMapReadyCallback {
                     LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
                     Toast.makeText(activity, "UPDATE", Toast.LENGTH_SHORT).show();
                     MarkerOptions m = new MarkerOptions().position(pos);
-                    map.addMarker(m);;
+                    map.addMarker(m);
                 }
 
                 public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -70,6 +70,7 @@ public class MapClass implements OnMapReadyCallback {
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_TIME_INTERVAL, GPS_DISTANCE, locationListener);
         }
+
     }
 
 }

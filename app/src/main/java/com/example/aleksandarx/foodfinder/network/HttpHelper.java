@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.aleksandarx.foodfinder.LoginActivity;
 import com.example.aleksandarx.foodfinder.share.UserPreferences;
+import com.google.android.gms.maps.GoogleMap;
 
 import org.json.JSONObject;
 
@@ -118,6 +119,38 @@ public class HttpHelper {
         return ret;
     }
 
+    public static void findPlacesAroundYou(double lat, double lng, GoogleMap map)
+    {
+        HttpURLConnection conn = null;
+        try {
+            conn = SetupConnection("http://food-finder-app.herokuapp.com/signinMobile",10000,15000,"POST","application/json; charset=UTF-8","application/json");
+
+            JSONObject data = new JSONObject();
+            data.put("lat", lat);
+            data.put("lng", lng);
+
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+            wr.write(data.toString());
+            wr.close();
+
+
+
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK){
+                InputStreamReader reader = new InputStreamReader(conn.getInputStream());
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            if(conn != null)
+                conn.disconnect();
+        }
+    }
+
 
     public static String sendPicture(byte[] picture)
     {
@@ -185,6 +218,7 @@ public class HttpHelper {
 
 
     }
+
     private static HttpURLConnection SetupConnection(String url,int readTimeout,int connectionTimeout,String method,String contentType,String accept) throws IOException {
 
         URL serverUrl = new URL(url);
@@ -203,6 +237,7 @@ public class HttpHelper {
 
         return conn;
     }
+
     public static String inputStreamToString(InputStream is)
     {
         String line = "";
