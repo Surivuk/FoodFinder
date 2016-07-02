@@ -21,7 +21,7 @@
         <activity
             android:name=".common.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -37,7 +37,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".common.BluetoothActivity"></activity>
+        <activity android:name=".bluetooth.DeviceListActivity" />
+        <activity android:name=".bluetooth.BluetoothMainActivity" />
     </application>
 
 </manifest>
