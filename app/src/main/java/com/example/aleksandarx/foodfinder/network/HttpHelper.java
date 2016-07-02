@@ -1,11 +1,9 @@
 package com.example.aleksandarx.foodfinder.network;
 
-import android.util.Log;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-import com.example.aleksandarx.foodfinder.LoginActivity;
-import com.example.aleksandarx.foodfinder.share.UserPreferences;
-import com.google.android.gms.maps.GoogleMap;
-
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -16,8 +14,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Darko on 27.06.2016.
@@ -119,15 +118,17 @@ public class HttpHelper {
         return ret;
     }
 
-    public static void findPlacesAroundYou(double lat, double lng, GoogleMap map)
+    public static List<MarkerOptions> findPlacesAroundYou(double lat, double lng)
     {
+        List<MarkerOptions> positions = new ArrayList<>();
+
         HttpURLConnection conn = null;
         try {
-            conn = SetupConnection("http://food-finder-app.herokuapp.com/signinMobile",10000,15000,"POST","application/json; charset=UTF-8","application/json");
+            conn = SetupConnection("http://food-finder-app.herokuapp.com/placesAround",10000,15000,"POST","application/json; charset=UTF-8","application/json");
 
             JSONObject data = new JSONObject();
-            data.put("lat", lat);
-            data.put("lng", lng);
+            data.put("lat", 43.541115);
+            data.put("lng", 21.711991);
 
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 
@@ -139,16 +140,35 @@ public class HttpHelper {
 
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK){
-                InputStreamReader reader = new InputStreamReader(conn.getInputStream());
+                String jsonContent =  inputStreamToString(conn.getInputStream());
+                JSONArray places = new JSONArray(jsonContent);
+                for(int i = 0 ; i < places.length(); i++)
+                {
+                    JSONObject place = places.getJSONObject(i);
+                    double latitude = place.getDouble("restaurant_latitude");
+                    double longitude = place.getDouble("restaurant_longitude");
+                    String name = place.getString("restaurant_name");
+
+                    MarkerOptions options = new MarkerOptions();
+                    options.position(new LatLng(latitude,longitude));
+                    options.title(name);
+
+                    positions.add(options);
+
+                }
 
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+
         }finally {
+
             if(conn != null)
                 conn.disconnect();
+            return positions;
         }
+
     }
 
 

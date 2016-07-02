@@ -1,12 +1,10 @@
-package com.example.aleksandarx.foodfinder;
+package com.example.aleksandarx.foodfinder.common;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,9 +13,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.ImageView;
 
+import com.example.aleksandarx.foodfinder.R;
 import com.example.aleksandarx.foodfinder.share.UserPreferences;
 
 public class MainActivity extends AppCompatActivity {
@@ -73,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_sign_out:
                 UserPreferences.removePreference(MainActivity.this, UserPreferences.USER_USERNAME);
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                return true;
+            case R.id.bluetooth:
+                Intent intent = new Intent(MainActivity.this,BluetoothActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

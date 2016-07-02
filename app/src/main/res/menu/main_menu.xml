@@ -5,7 +5,8 @@
 
     <item android:id="@+id/menu_about"
         android:title="@string/menu_about" />
-
+    <item android:id="@+id/bluetooth"
+        android:title="@string/bluetooth" />
     <item android:id="@+id/menu_sign_out"
         android:title="@string/menu_sign_out" />
 </menu>
