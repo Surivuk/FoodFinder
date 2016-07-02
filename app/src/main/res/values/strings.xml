@@ -22,5 +22,7 @@
     <string name="menu_sign_out">Sign out</string>
 
     <string name="about_text">FoodFinder is fast way to share your feeling about food with other people. Also provides plenty of opportunities to find your favorite foods that surrounds you.</string>
+    <string name="bluetooth_button_test">Test</string>
+    <string name="bluetooth">Bluetooth</string>
 
 </resources>
