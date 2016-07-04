@@ -50,12 +50,14 @@ public class SocketActivity extends AppCompatActivity {
     private Button leaveGroupButton;
     private String connectionID;
     private String foodType;
-
+    private ArrayList<String> foodTypes;
+    private String liveServer = "http://food-finder-app.herokuapp.com/";
+    //private String darkoServer = "http://192.168.1.15:8081";
     private HashMap<String,LatLng> positions;
 
     {
         try {
-            mSocket = IO.socket("http://192.168.1.15:8081");
+            mSocket = IO.socket(liveServer);
             socketConnected = true;
         } catch (URISyntaxException e)
         {
@@ -78,7 +80,7 @@ public class SocketActivity extends AppCompatActivity {
                 for(int i = 0 ; i < people.length(); i ++)
                 {
                     JSONObject person = people.getJSONObject(i);
-                    if(foodType.equals(person.getString("foodType")) && !connectionID.equals(person.get("connectionID")))
+                    if(foodTypes.contains(person.getString("foodType")) && !connectionID.equals(person.get("connectionID")) && !peoplesName.contains(person.get("connectionID")))
                     {
                         peoplesName.add(person.getString("connectionID"));
                         LatLng position = new LatLng(person.getDouble("latitude"),person.getDouble("longitude"));
@@ -127,12 +129,16 @@ public class SocketActivity extends AppCompatActivity {
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         context = this;
         setContentView(R.layout.activity_socket_test);
         guiThread = new Handler();
+        foodTypes = new ArrayList<>();
 
         positions = new HashMap<>();
+
+        currentPosition = new LatLng(0,0);
 
         if (ContextCompat.checkSelfPermission(SocketActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager locationManager = (LocationManager) SocketActivity.this.getSystemService(SocketActivity.this.LOCATION_SERVICE);
@@ -198,7 +204,10 @@ public class SocketActivity extends AppCompatActivity {
         leaveGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSocket.emit("leaveGroup",new PersonModel(connectionID,foodType,currentPosition.latitude,currentPosition.longitude));
+                mSocket.emit("leaveGroup",new PersonModel(connectionID,foodOrigin.getSelectedItem().toString(),currentPosition.latitude,currentPosition.longitude));
+
+                foodTypes.remove(foodOrigin.getSelectedItem().toString());
+
                 foodType = "";
                 peopleAdapter.clear();
                 peopleAdapter.notifyDataSetInvalidated();
@@ -210,6 +219,7 @@ public class SocketActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 foodType = foodOrigin.getSelectedItem().toString();
+                foodTypes.add(foodOrigin.getSelectedItem().toString());
 
                 if(currentPosition == null)
                 {
