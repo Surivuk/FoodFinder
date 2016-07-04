@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.aleksandarx.foodfinder.R;
+import com.example.aleksandarx.foodfinder.bluetooth.BluetoothMainActivity;
+import com.example.aleksandarx.foodfinder.bluetooth.BluetoothModel;
 import com.example.aleksandarx.foodfinder.share.UserPreferences;
 
 public class MainActivity extends AppCompatActivity {
@@ -72,9 +74,13 @@ public class MainActivity extends AppCompatActivity {
                 UserPreferences.removePreference(MainActivity.this, UserPreferences.USER_USERNAME);
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 return true;
-            case R.id.bluetooth:
-                Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
+            case R.id.menu_bluetooth:
+                Intent intent = new Intent(MainActivity.this,BluetoothMainActivity.class);
+                intent.putExtra("food",new BluetoothModel(43.2,23.1,"Na cose","ItalianFood"));
                 startActivity(intent);
+                return true;
+            case R.id.menu_settings:
+                startActivity(new Intent(MainActivity.this,SettingsActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

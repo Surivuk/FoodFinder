@@ -18,7 +18,7 @@ import java.util.UUID;
 /**
  * Created by Darko on 02.07.2016.
  */
-public class BluetoothService {
+public class BluetoothChatService {
 
     // Debugging
     private static final String TAG = "BluetoothChatService";
@@ -54,7 +54,7 @@ public class BluetoothService {
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-    public BluetoothService(Context context, Handler handler) {
+    public BluetoothChatService(Context context, Handler handler) {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mHandler = handler;
@@ -245,7 +245,7 @@ public class BluetoothService {
         mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
-        BluetoothService.this.start();
+        BluetoothChatService.this.start();
     }
 
     /**
@@ -260,7 +260,7 @@ public class BluetoothService {
         mHandler.sendMessage(msg);
 
         // Start the service over to restart listening mode
-        BluetoothService.this.start();
+        BluetoothChatService.this.start();
     }
 
     /**
@@ -312,7 +312,7 @@ public class BluetoothService {
 
                 // If a connection was accepted
                 if (socket != null) {
-                    synchronized (BluetoothService.this) {
+                    synchronized (BluetoothChatService.this) {
                         switch (mState) {
                             case STATE_LISTEN:
                             case STATE_CONNECTING:
@@ -404,7 +404,7 @@ public class BluetoothService {
             }
 
             // Reset the ConnectThread because we're done
-            synchronized (BluetoothService.this) {
+            synchronized (BluetoothChatService.this) {
                 mConnectThread = null;
             }
 
@@ -466,7 +466,7 @@ public class BluetoothService {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
                     // Start the service over to restart listening mode
-                    BluetoothService.this.start();
+                    BluetoothChatService.this.start();
                     break;
                 }
             }
