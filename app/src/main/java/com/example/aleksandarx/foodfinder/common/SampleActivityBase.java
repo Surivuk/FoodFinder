@@ -17,7 +17,7 @@
 package com.example.aleksandarx.foodfinder.common;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.example.aleksandarx.foodfinder.common.logger.Log;
 import com.example.aleksandarx.foodfinder.common.logger.LogWrapper;
@@ -26,7 +26,7 @@ import com.example.aleksandarx.foodfinder.common.logger.LogWrapper;
 /**
  * Base launcher activity, to handle most of the common plumbing for samples.
  */
-public class SampleActivityBase extends FragmentActivity {
+public class SampleActivityBase extends AppCompatActivity {
 
     public static final String TAG = "SampleActivityBase";
 

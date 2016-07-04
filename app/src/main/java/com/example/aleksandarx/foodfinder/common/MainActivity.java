@@ -68,15 +68,30 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_places:
 
+                Intent intento = new Intent(MainActivity.this,SocketActivity.class);
+                //intent.putExtra("food",new BluetoothModel(43.2,23.1,"Na cose","ItalianFood"));
+                startActivity(intento);
                 return true;
             case R.id.menu_sign_out:
                 UserPreferences.removePreference(MainActivity.this, UserPreferences.USER_USERNAME);
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 return true;
-            case R.id.bluetooth:
-               Intent intent = new Intent(MainActivity.this,BluetoothMainActivity.class);
+            case R.id.menu_bluetooth:
+                //Intent intent = new Intent(MainActivity.this,BluetoothMainActivity.class);
+                //intent.putExtra("food",new BluetoothModel(43.2,23.1,"Na cose","ItalianFood"));
+                //startActivity(intent);
+
+                Intent intent = new Intent(MainActivity.this,BluetoothMainActivity.class);
                 intent.putExtra("food",new BluetoothModel(43.2,23.1,"Na cose","ItalianFood"));
+
                 startActivity(intent);
+
+                return true;
+            case R.id.menu_settings:
+
+                Intent i = new Intent(MainActivity.this,SettingsActivity.class);
+                startActivity(i);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
