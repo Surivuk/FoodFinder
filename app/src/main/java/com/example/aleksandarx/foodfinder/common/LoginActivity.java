@@ -174,38 +174,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
         return output;
     }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_PHOTO_FOR_AVATAR && resultCode == Activity.RESULT_OK) {
-            if (data == null) {
-                //Display an error
-                return;
-            }
-            try {
-                InputStream is = context.getContentResolver().openInputStream(data.getData());
-
-                final byte[] imageBytes = readFully(is,-1,true);
-
-                ExecutorService transThread = Executors.newSingleThreadExecutor();
-                transThread.submit(new Runnable()
-                {
-                    public void run(){
-
-                        final String message = HttpHelper.sendPicture(imageBytes);
-                        guiNotifyUser(message);
-                    }
-                });
-                //HttpHelper.sendPicture(imageBytes);
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
-        }
-    }
 
 
     private void guiNotifyUser(final String message)

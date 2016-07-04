@@ -9,4 +9,6 @@
         android:title="@string/bluetooth" />
     <item android:id="@+id/menu_sign_out"
         android:title="@string/menu_sign_out" />
+    <item android:id="@+id/testOne"
+        android:title="Test" />
 </menu>

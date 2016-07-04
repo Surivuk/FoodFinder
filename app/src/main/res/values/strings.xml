@@ -7,7 +7,7 @@
     <string name="prompt_email">Username</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
-    <string name="signup">Sign up</string>
+    <string name="sign_up">Sign up</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
@@ -17,7 +17,7 @@
     <string name="avatar_button">Choose your avatar image</string>
 
     <string name="menu_about">About</string>
-    <string name="menu_my_places">My Places</string>
+    <string name="menu_my_places">My Food</string>
     <string name="menu_home">Home</string>
     <string name="menu_sign_out">Sign out</string>
 
@@ -25,4 +25,32 @@
     <string name="bluetooth_button_test">Test</string>
     <string name="bluetooth">Bluetooth</string>
 
+    <string name="empty_list">There is no food!</string>
+
+    <string-array name="food_type_array">
+        <item>Pasta</item>
+        <item>Meat</item>
+        <item>Fish</item>
+        <item>Egs</item>
+        <item>Salad</item>
+        <item>Dessert</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="origin_array">
+        <item>Italian</item>
+        <item>France</item>
+        <item>English</item>
+        <item>Indian</item>
+        <item>Chinese</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="meal_type_array">
+        <item>Breakfast</item>
+        <item>Lunch</item>
+        <item>Dinner</item>
+    </string-array>
+
 </resources>
+

@@ -80,15 +80,6 @@
                 android:text="@string/action_sign_in"
                 android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/signup"
-                android:id="@+id/signup"
-                android:layout_gravity="center_horizontal"
-                android:textColor="#006837" />
-
             <!--<Button
                 android:id="@+id/choose_avatar_button"
                 style="?android:textAppearanceSmall"

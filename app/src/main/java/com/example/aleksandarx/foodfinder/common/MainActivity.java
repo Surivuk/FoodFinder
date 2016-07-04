@@ -65,14 +65,15 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
                 return true;
             case R.id.menu_places:
-
+                Intent i = new Intent(MainActivity.this, FoodArticlesActivity.class);
+                startActivity(i);
                 return true;
             case R.id.menu_sign_out:
                 UserPreferences.removePreference(MainActivity.this, UserPreferences.USER_USERNAME);
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 return true;
             case R.id.bluetooth:
-                Intent intent = new Intent(MainActivity.this,BluetoothActivity.class);
+                Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
                 startActivity(intent);
                 return true;
             default:

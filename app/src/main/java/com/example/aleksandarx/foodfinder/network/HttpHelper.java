@@ -1,5 +1,8 @@
 package com.example.aleksandarx.foodfinder.network;
 
+import android.widget.Toast;
+
+import com.example.aleksandarx.foodfinder.data.model.FoodModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -25,8 +28,7 @@ public class HttpHelper {
     private static String localServer = "http://192.168.1.15:8081/";
     private static String herokuLive = "http://food-finder-app.herokuapp.com/";
     private static String server = herokuLive;
-    public static String signUpHeroku(String username,String password)
-    {
+    public static String signUpHeroku(String username,String password) {
         String retStr = "";
         HttpURLConnection conn = null;
         try {
@@ -87,8 +89,7 @@ public class HttpHelper {
 
     }
 
-    public static boolean loginHeroku(String username, String password)
-    {
+    public static boolean loginHeroku(String username, String password) {
         HttpURLConnection conn = null;
         boolean ret = false;
         try {
@@ -135,9 +136,6 @@ public class HttpHelper {
             wr.write(data.toString());
             wr.close();
 
-
-
-
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK){
                 String jsonContent =  inputStreamToString(conn.getInputStream());
@@ -154,7 +152,6 @@ public class HttpHelper {
                     options.title(name);
 
                     positions.add(options);
-
                 }
 
             }
@@ -171,8 +168,31 @@ public class HttpHelper {
 
     }
 
+    /*public static boolean newFood(JSONObject data){
+        HttpURLConnection conn = null;
+        boolean ret = false;
+        try {
+            conn = SetupConnection("http://food-finder-app.herokuapp.com/newFood", 10000, 15000, "POST", "application/json; charset=UTF-8", "application/json");
 
-    public static String sendPicture(byte[] picture)
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+            wr.write(data.toString());
+            wr.close();
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK){
+                ret = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            if(conn != null)
+                conn.disconnect();
+            return ret;
+        }
+    }*/
+
+    public static String newFood(byte[] picture, JSONObject jsonData)
     {
         String attachmentName = "imageFile";
         String attachmentFileName = "bitmap.png";
@@ -182,7 +202,7 @@ public class HttpHelper {
 
         try{
             HttpURLConnection httpUrlConnection = null;
-            URL url = new URL(server+"newFood");
+            URL url = new URL("http://192.168.1.7:8081/newFood");
             httpUrlConnection = (HttpURLConnection) url.openConnection();
             httpUrlConnection.setUseCaches(false);
             httpUrlConnection.setDoOutput(true);
@@ -190,44 +210,75 @@ public class HttpHelper {
             httpUrlConnection.setRequestMethod("POST");
             httpUrlConnection.setRequestProperty("Connection", "Keep-Alive");
             httpUrlConnection.setRequestProperty("Cache-Control", "no-cache");
-            httpUrlConnection.setRequestProperty(
-                    "Content-Type", "multipart/form-data;boundary=" + boundary);
-            DataOutputStream request = new DataOutputStream(
-                    httpUrlConnection.getOutputStream());
+            httpUrlConnection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+
+            DataOutputStream request = new DataOutputStream(httpUrlConnection.getOutputStream());
+
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"" +
-                    attachmentName + "\";filename=\"" +
-                    attachmentFileName + "\"" + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"" + attachmentName + "\";filename=\"" + attachmentFileName + "\"" + crlf);
             request.writeBytes(crlf);
 
             request.write(picture);
+
             request.writeBytes(crlf);
-            request.writeBytes(twoHyphens + boundary +
-                    twoHyphens + crlf);
+
+            String test = "{\"geometry\":{\"location\":{\"lat\":43.5409446,\"lng\":21.711441400000012},\"viewport\":{\"south\":43.54081049999998,\"west\":21.71143059999997,\"north\":43.5409893,\"east\":21.71147380000002}},\"icon\":\"https://maps.gstatic.com/mapfiles/place_api/icons/restaurant-71.png\",\"id\":\"4548bed3130fa8918f07719672157a6613f1d454\",\"name\":\"Restoran Zlatno Cose\",\"opening_hours\":{\"open_now\":true,\"weekday_text\":[]},\"place_id\":\"ChIJEU3NgJAtVEcRhgXPtNDWBSo\",\"reference\":\"CnRnAAAAayME6-R_8IpyFZ7RUnG_U9mb95CFjDb9_xQyzHhAuV_NatsawvloWfce8wYKBddQ6NiHECfkW8_IzS3hbznAGrGN54gLtLg5Bcr8uxZXhe246OTQnz2sSx5sELxGziIKlOTbq-j9Gb8r4zIdgg7bbxIQd7Zudd2Z3COb6m_7fhiXQBoUorVUEVHK6leXsljCV2VgCijm9dM\",\"scope\":\"GOOGLE\",\"types\":[\"restaurant\",\"food\",\"point_of_interest\",\"establishment\"],\"vicinity\":\"MomÄ\u008Dila PopoviÄ\u0087a, Aleksinac\",\"html_attributions\":[]}\n";
+
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"articleName\"" + crlf + crlf + jsonData.getString("articleName") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"user_id\"" + crlf + crlf + "1" + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"isFood\"" + crlf + crlf + jsonData.getString("isFood") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"mealType\"" + crlf + crlf + jsonData.getString("mealType") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"foodType\"" + crlf + crlf + jsonData.getString("foodType") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"origin\"" + crlf + crlf + jsonData.getString("origin") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"locationName\"" + crlf + crlf + jsonData.getJSONObject("location").getString("name") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"locationLat\"" + crlf + crlf + jsonData.getJSONObject("location").getString("lat") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"locationLng\"" + crlf + crlf + jsonData.getJSONObject("location").getString("lng") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"locationAddress\"" + crlf + crlf + jsonData.getJSONObject("location").getString("vicinity") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"place_id\"" + crlf + crlf + jsonData.getJSONObject("location").getString("place_id") + crlf);
+
+            request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"mobile\"" + crlf + crlf + "mobile" + crlf);
+
+            request.writeBytes(twoHyphens + boundary + twoHyphens + crlf);
+
             request.flush();
             request.close();
 
-            //response
-            InputStream responseStream = new
-                    BufferedInputStream(httpUrlConnection.getInputStream());
+            System.out.println(boundary + crlf + "Content-Disposition: form-data; name=\"articleName\"" + crlf + crlf + jsonData.getString("articleName") + crlf);
 
-            BufferedReader responseStreamReader =
-                    new BufferedReader(new InputStreamReader(responseStream));
+            int responseCode = httpUrlConnection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK){
+                httpUrlConnection.disconnect();
 
-            String line = "";
-            StringBuilder stringBuilder = new StringBuilder();
 
-            while ((line = responseStreamReader.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
+
+                return "Successful";
             }
-            responseStreamReader.close();
-
-            String response = stringBuilder.toString();
-            responseStream.close();
 
             httpUrlConnection.disconnect();
-            return "Successful";
         }
         catch(Exception e)
         {
@@ -235,8 +286,7 @@ public class HttpHelper {
             return "Failed";
         }
 
-
-
+        return "Failed";
     }
 
     private static HttpURLConnection SetupConnection(String url,int readTimeout,int connectionTimeout,String method,String contentType,String accept) throws IOException {
