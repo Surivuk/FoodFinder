@@ -41,6 +41,17 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        Intent invokingIntent = getIntent();
+        Bundle personBundle = invokingIntent.getExtras();
+        if(personBundle != null)
+        {
+            String personID = personBundle.getString("personsID");
+            double personLat = personBundle.getDouble("personsLat");
+            double personLng = personBundle.getDouble("personsLng");
+
+            myMap.addPersonMarker(personID,personLat,personLng);
+        }
     }
 
     @Override
@@ -82,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_settings:
                 startActivity(new Intent(MainActivity.this,SettingsActivity.class));
+                return true;
+            case R.id.menu_find_people:
+                startActivity(new Intent(MainActivity.this,SocketActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

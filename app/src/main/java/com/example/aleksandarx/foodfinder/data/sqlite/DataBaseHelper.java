@@ -20,15 +20,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+
+    @Override
     public void onCreate(SQLiteDatabase db) {
         foodTable = new FoodTable();
         db.execSQL(foodTable.sqlCreateEntrise());
     }
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(foodTable.sqlDeleteEntrise());
         onCreate(db);
     }
-
+    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
