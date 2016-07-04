@@ -1,22 +1,19 @@
 package com.example.aleksandarx.foodfinder.network;
 
-import android.widget.Toast;
-
-import com.example.aleksandarx.foodfinder.common.CreateFoodActivity;
 import com.example.aleksandarx.foodfinder.data.model.FoodModel;
-import com.example.aleksandarx.foodfinder.share.UserPreferences;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -28,7 +25,7 @@ import java.util.List;
  * Created by Darko on 27.06.2016.
  */
 public class HttpHelper {
-    private static String localServer = "http://192.168.1.7:8081/";
+    private static String localServer = "http://192.168.1.15:8081/";
     private static String herokuLive = "http://food-finder-app.herokuapp.com/";
     private static String server = herokuLive;
     public static String signUpHeroku(String username,String password) {
@@ -177,8 +174,19 @@ public class HttpHelper {
         HttpURLConnection conn = null;
         boolean ret = false;
         try {
-            conn = SetupConnection(localServer + "articlesMobile", 10000, 15000, "GET", "application/json; charset=UTF-8", "application/json");
-            conn.setRequestProperty("id", id);
+            conn = SetupConnection(localServer + "articlesMobile?id="+id, 10000, 15000, "POST", "-1", "application/json");
+            //conn.setRequestProperty("id", id);
+
+            OutputStream os = conn.getOutputStream();
+
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(os, "UTF-8"));
+            String query = "id="+id;
+            writer.write(query);
+            writer.flush();
+            writer.close();
+            os.close();
+
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK){
                 String reader = inputStreamToString(conn.getInputStream());
@@ -216,7 +224,7 @@ public class HttpHelper {
 
         try{
             HttpURLConnection httpUrlConnection = null;
-            URL url = new URL("http://192.168.1.7:8081/newFood");
+            URL url = new URL("http://192.168.1.15:8081/newFood");
             httpUrlConnection = (HttpURLConnection) url.openConnection();
             httpUrlConnection.setUseCaches(false);
             httpUrlConnection.setDoOutput(true);
@@ -321,7 +329,8 @@ public class HttpHelper {
         conn.setDoInput(true);
         conn.setDoOutput(true);
         //conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        conn.setRequestProperty("Content-Type", contentType);
+        if(!contentType.equals("-1"))
+            conn.setRequestProperty("Content-Type", contentType);
         //conn.setRequestProperty("Accept", "application/json");
         conn.setRequestProperty("Accept", accept);
 

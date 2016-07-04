@@ -10,11 +10,12 @@ import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
-import com.example.aleksandarx.foodfinder.common.MainActivity;
+import com.example.aleksandarx.foodfinder.R;
 import com.example.aleksandarx.foodfinder.network.HttpHelper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -28,12 +29,16 @@ import java.util.concurrent.Executors;
  */
 public class MapClass implements OnMapReadyCallback {
 
+    public boolean mapReady;
     private MainActivity activity;
     private GoogleMap map;
     private static final int GPS_TIME_INTERVAL = 10000; // get gps location every 1 min
     private static final int GPS_DISTANCE = 100; // set the distance value in meter
     private Handler guiThread;
+    private MarkerOptions personsMarker = null;
+
     public MapClass(int mapId, MainActivity act){
+        mapReady = false;
         activity = act;
         SupportMapFragment mapFragment = (SupportMapFragment) act.getSupportFragmentManager()
                 .findFragmentById(mapId);
@@ -43,6 +48,7 @@ public class MapClass implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mapReady = true;
         map = googleMap;
         guiThread = new Handler();
 
@@ -87,6 +93,12 @@ public class MapClass implements OnMapReadyCallback {
             };
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_TIME_INTERVAL, GPS_DISTANCE, locationListener);
+
+
+            if(personsMarker != null)
+            {
+                map.addMarker(personsMarker);
+            }
         }
 
     }
@@ -103,7 +115,14 @@ public class MapClass implements OnMapReadyCallback {
             }
         });
     }
-
+    public boolean addPersonMarker(String title,double lat,double lng)
+    {
+            personsMarker = new MarkerOptions();
+            personsMarker.title(title);
+            personsMarker.position(new LatLng(lat,lng));
+            personsMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_custom_pin));
+            return mapReady;
+    }
 }
 
 

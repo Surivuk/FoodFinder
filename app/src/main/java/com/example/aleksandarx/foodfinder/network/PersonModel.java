@@ -6,10 +6,14 @@ package com.example.aleksandarx.foodfinder.network;
 public class PersonModel {
     public String connectionID;
     public String foodType;
-    public PersonModel(String cid,String ft)
+    public double latitude;
+    public double longitude;
+    public PersonModel(String cid,String ft,double lat,double lng)
     {
         connectionID = cid;
         foodType = ft;
+        latitude = lat;
+        longitude = lng;
     }
 
     @Override
@@ -17,6 +21,8 @@ public class PersonModel {
         String json = "{";
         json += "\"connectionID\":\""+connectionID+"\"";
         json += ",\"foodType\":\""+foodType+"\"";
+        json += ",\"latitude\":\""+String.valueOf(latitude)+"\"";
+        json += ",\"longitude\":\""+String.valueOf(longitude)+"\"";
         json += "}";
         return json;
     }
