@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.aleksandarx.foodfinder.R;
 import com.example.aleksandarx.foodfinder.network.HttpHelper;
+import com.example.aleksandarx.foodfinder.share.UserPreferences;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -35,6 +36,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,9 +44,10 @@ public class CreateFoodActivity extends AppCompatActivity {
 
     private LinearLayout foodPanel;
     private byte[] imgBuffer;
+    private String imgUri;
     private JSONObject restaurant;
 
-    private Bitmap tmp;
+    private Bitmap tmpBitmap;
 
 
     private EditText foodName;
@@ -70,6 +73,7 @@ public class CreateFoodActivity extends AppCompatActivity {
 
         guiThread = new Handler();
         imgBuffer = null;
+        tmpBitmap = null;
 
         foodType = (Spinner) findViewById(R.id.food_type_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.food_type_array, android.R.layout.simple_spinner_item);
@@ -133,51 +137,70 @@ public class CreateFoodActivity extends AppCompatActivity {
         });
 
         Button submitFood = (Button) findViewById(R.id.submit_food);
-
-        submitFood.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ExecutorService t = Executors.newSingleThreadExecutor();
-                t.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(imgBuffer == null) {
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            tmp.compress(Bitmap.CompressFormat.JPEG, 20, stream);
-                            imgBuffer = stream.toByteArray();
-                        }
-                        guiNotifyUser(HttpHelper.newFood(imgBuffer, creatFoodObject()));
+        if(submitFood != null) {
+            submitFood.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (restaurant != null && !foodName.getEditableText().toString().isEmpty()) {
+                        ExecutorService t = Executors.newSingleThreadExecutor();
+                        t.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (imgBuffer == null && tmpBitmap != null) {
+                                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                    tmpBitmap.compress(Bitmap.CompressFormat.JPEG, 20, stream);
+                                    imgBuffer = stream.toByteArray();
+                                    tmpBitmap = null;
+                                }
+                                guiNotifyUser(HttpHelper.newFood(imgBuffer, createFoodObject()));
+                            }
+                        });
+                    } else {
+                        Toast.makeText(CreateFoodActivity.this, "No name of place!", Toast.LENGTH_SHORT).show();
                     }
-                });
-            }
-        });
+                }
+            });
+        }
     }
 
-    private JSONObject creatFoodObject(){
-        JSONObject data = new JSONObject();
+    private HashMap<String, String> createFoodObject(){
+        HashMap<String, String> obj = new HashMap<>();
+        obj.put("user_id", UserPreferences.getPreference(CreateFoodActivity.this, UserPreferences.USER_ID));
+        if(!foodName.getText().toString().isEmpty())
+            obj.put("articleName", foodName.getText().toString());
+
+        if(!foodDescription.getText().toString().isEmpty())
+            obj.put("articleDescription", foodDescription.getText().toString());
+
+        if(foodOrDrink.isChecked()){
+            obj.put("isFood", "on");
+            obj.put("origin", foodOrigin.getSelectedItem().toString());
+            obj.put("foodType", foodType.getSelectedItem().toString());
+            obj.put("mealType", mealType.getSelectedItem().toString());
+        }
+        else
+            obj.put("isFood", "off");
+
         try {
-            data.put("user_id", 1);
-            data.put("articleName", foodName.getText().toString());
-            data.put("articleDescription", foodDescription.getText().toString());
-            data.put("origin", foodOrigin.getSelectedItem().toString());
-            data.put("foodType", foodType.getSelectedItem().toString());
-            data.put("mealType", mealType.getSelectedItem().toString());
-            if(foodOrDrink.isChecked())
-                data.put("isFood", "on");
-            else
-                data.put("isFood", "off");
-            data.put("location", restaurant);
+            obj.put("locationName", restaurant.getString("name"));
+            obj.put("locationAddress", restaurant.getString("vicinity"));
+            obj.put("place_id", restaurant.getString("place_id"));
+            obj.put("locationLat", restaurant.getString("lat"));
+            obj.put("locationLng", restaurant.getString("lng"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return data;
+        return obj;
     }
+
 
     private void guiNotifyUser(final String message)
     {
         guiThread.post(new Runnable(){
             public void run(){
                 Toast.makeText(CreateFoodActivity.this, message, Toast.LENGTH_LONG).show();
+                startActivity(new Intent(CreateFoodActivity.this, FoodArticlesActivity.class));
+                finish();
             }
         });
     }
@@ -188,8 +211,9 @@ public class CreateFoodActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK && requestCode == 16){
                 String result = data.getStringExtra("uri");
                 Uri imageUri = Uri.parse(result);
+                imgUri = result;
                 try {
-                    tmp = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                    tmpBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
                     foodImageButton.setBackgroundColor(Color.rgb(0,150,136));
                     foodImageButton.setTextColor(Color.WHITE);
                 } catch (IOException e) {
@@ -199,16 +223,8 @@ public class CreateFoodActivity extends AppCompatActivity {
             else if(requestCode == PLACE_PICKER_REQUEST && resultCode == Activity.RESULT_OK) {
                 final Place place = PlacePicker.getPlace(this, data);
                 if (place.getPlaceTypes().contains(Place.TYPE_FOOD)) {
-                    final CharSequence name = place.getName();
-                    final CharSequence address = place.getAddress();
-                    String attributions = (String) place.getAttributions();
-                    if (attributions == null) {
-                        attributions = "";
-                    }
-
                     restaurant = new JSONObject();
                     try {
-
                         restaurant.put("name", place.getName());
                         restaurant.put("vicinity", place.getAddress());
                         restaurant.put("place_id", place.getId());
@@ -218,11 +234,10 @@ public class CreateFoodActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //Toast.makeText(CreateFoodActivity.this, place.toString(), Toast.LENGTH_LONG).show();
                 }
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
-    }//onActivityResult
+    }
 }

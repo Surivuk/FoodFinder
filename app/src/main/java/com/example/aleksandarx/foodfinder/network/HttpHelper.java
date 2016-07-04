@@ -2,7 +2,9 @@ package com.example.aleksandarx.foodfinder.network;
 
 import android.widget.Toast;
 
+import com.example.aleksandarx.foodfinder.common.CreateFoodActivity;
 import com.example.aleksandarx.foodfinder.data.model.FoodModel;
+import com.example.aleksandarx.foodfinder.share.UserPreferences;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -19,13 +21,14 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by Darko on 27.06.2016.
  */
 public class HttpHelper {
-    private static String localServer = "http://192.168.1.15:8081/";
+    private static String localServer = "http://192.168.1.7:8081/";
     private static String herokuLive = "http://food-finder-app.herokuapp.com/";
     private static String server = herokuLive;
     public static String signUpHeroku(String username,String password) {
@@ -89,11 +92,11 @@ public class HttpHelper {
 
     }
 
-    public static boolean loginHeroku(String username, String password) {
+    public static String loginHeroku(String username, String password) {
         HttpURLConnection conn = null;
-        boolean ret = false;
+        String ret = "ERROR";
         try {
-            conn = SetupConnection("http://food-finder-app.herokuapp.com/signinMobile",10000,15000,"POST","application/json; charset=UTF-8","application/json");
+            conn = SetupConnection(localServer + "signinMobile", 10000, 15000, "POST","application/json; charset=UTF-8","application/json");
 
             JSONObject data = new JSONObject();
             data.put("username", username);
@@ -104,10 +107,12 @@ public class HttpHelper {
             wr.write(data.toString());
             wr.close();
 
-
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK){
-                ret = true;
+                String reader = inputStreamToString(conn.getInputStream());
+                JSONObject json = new JSONObject(reader);
+                String id = json.getString("user_id");
+                ret = id;
             }
 
         } catch (Exception e) {
@@ -168,19 +173,28 @@ public class HttpHelper {
 
     }
 
-    /*public static boolean newFood(JSONObject data){
+    public static boolean getMyFood(String id){
         HttpURLConnection conn = null;
         boolean ret = false;
         try {
-            conn = SetupConnection("http://food-finder-app.herokuapp.com/newFood", 10000, 15000, "POST", "application/json; charset=UTF-8", "application/json");
-
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-
-            wr.write(data.toString());
-            wr.close();
-
+            conn = SetupConnection(localServer + "articlesMobile", 10000, 15000, "GET", "application/json; charset=UTF-8", "application/json");
+            conn.setRequestProperty("id", id);
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK){
+                String reader = inputStreamToString(conn.getInputStream());
+                JSONArray array = new JSONArray(reader);
+                for(int i = 0; i < array.length(); i++){
+                    JSONObject json = array.getJSONObject(i);
+                    FoodModel model = new FoodModel();
+                    model.addItem("user_id", json.getString("article_user"));
+                    model.addItem("articleName", json.getString("article_name"));
+                    model.addItem("origin", json.getString("article_origin"));
+                    model.addItem("foodType", json.getString("food_type"));
+                    model.addItem("locationName", json.getString("restaurant_name"));
+                    model.addItem("locationAddress", json.getString("restaurant_address"));
+                    model.addItem("place_id", json.getString("restaurant_google_id"));
+                    model.setDb_id(Long.parseLong(json.getString("article_id")));
+                }
                 ret = true;
             }
         } catch (Exception e) {
@@ -190,9 +204,9 @@ public class HttpHelper {
                 conn.disconnect();
             return ret;
         }
-    }*/
+    }
 
-    public static String newFood(byte[] picture, JSONObject jsonData)
+    public static String newFood(byte[] picture, HashMap<String, String> data)
     {
         String attachmentName = "imageFile";
         String attachmentFileName = "bitmap.png";
@@ -214,60 +228,66 @@ public class HttpHelper {
 
             DataOutputStream request = new DataOutputStream(httpUrlConnection.getOutputStream());
 
+            FoodModel model = new FoodModel();
+
+            if(picture != null) {
+                //************************************
+                request.writeBytes(twoHyphens + boundary + crlf);
+                request.writeBytes("Content-Disposition: form-data; name=\"" + attachmentName + "\";filename=\"" + attachmentFileName + "\"" + crlf);
+                request.writeBytes(crlf);
+                request.write(picture);
+                request.writeBytes(crlf);
+                //************************************
+            }
+
+            String[] tmpFields = FoodModel.FIELDS;
+            for(int i = 0; i < tmpFields.length; i++){
+                if(data.containsKey(tmpFields[i])){
+                    request.writeBytes(twoHyphens + boundary + crlf);
+                    request.writeBytes("Content-Disposition: form-data; name=\"" + tmpFields[i] + "\"" + crlf + crlf + data.get("articleName") + crlf);
+                }
+            }
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"" + attachmentName + "\";filename=\"" + attachmentFileName + "\"" + crlf);
-            request.writeBytes(crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"mobile\"" + crlf + crlf + "mobile" + crlf);
+            request.writeBytes(twoHyphens + boundary + twoHyphens + crlf);
 
-            request.write(picture);
-
-            request.writeBytes(crlf);
-
-            String test = "{\"geometry\":{\"location\":{\"lat\":43.5409446,\"lng\":21.711441400000012},\"viewport\":{\"south\":43.54081049999998,\"west\":21.71143059999997,\"north\":43.5409893,\"east\":21.71147380000002}},\"icon\":\"https://maps.gstatic.com/mapfiles/place_api/icons/restaurant-71.png\",\"id\":\"4548bed3130fa8918f07719672157a6613f1d454\",\"name\":\"Restoran Zlatno Cose\",\"opening_hours\":{\"open_now\":true,\"weekday_text\":[]},\"place_id\":\"ChIJEU3NgJAtVEcRhgXPtNDWBSo\",\"reference\":\"CnRnAAAAayME6-R_8IpyFZ7RUnG_U9mb95CFjDb9_xQyzHhAuV_NatsawvloWfce8wYKBddQ6NiHECfkW8_IzS3hbznAGrGN54gLtLg5Bcr8uxZXhe246OTQnz2sSx5sELxGziIKlOTbq-j9Gb8r4zIdgg7bbxIQd7Zudd2Z3COb6m_7fhiXQBoUorVUEVHK6leXsljCV2VgCijm9dM\",\"scope\":\"GOOGLE\",\"types\":[\"restaurant\",\"food\",\"point_of_interest\",\"establishment\"],\"vicinity\":\"MomÄ\u008Dila PopoviÄ\u0087a, Aleksinac\",\"html_attributions\":[]}\n";
-
-
-            request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"articleName\"" + crlf + crlf + jsonData.getString("articleName") + crlf);
+            /*request.writeBytes(twoHyphens + boundary + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"articleName\"" + crlf + crlf + data.getString("articleName") + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
             request.writeBytes("Content-Disposition: form-data; name=\"user_id\"" + crlf + crlf + "1" + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"isFood\"" + crlf + crlf + jsonData.getString("isFood") + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"isFood\"" + crlf + crlf + data.getString("isFood") + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"mealType\"" + crlf + crlf + jsonData.getString("mealType") + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"mealType\"" + crlf + crlf + data.getString("mealType") + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"foodType\"" + crlf + crlf + jsonData.getString("foodType") + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"foodType\"" + crlf + crlf + data.getString("foodType") + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"origin\"" + crlf + crlf + jsonData.getString("origin") + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"origin\"" + crlf + crlf + data.getString("origin") + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"locationName\"" + crlf + crlf + jsonData.getJSONObject("location").getString("name") + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"locationName\"" + crlf + crlf + data.getJSONObject("location").getString("name") + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"locationLat\"" + crlf + crlf + jsonData.getJSONObject("location").getString("lat") + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"locationLat\"" + crlf + crlf + data.getJSONObject("location").getString("lat") + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"locationLng\"" + crlf + crlf + jsonData.getJSONObject("location").getString("lng") + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"locationLng\"" + crlf + crlf + data.getJSONObject("location").getString("lng") + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"locationAddress\"" + crlf + crlf + jsonData.getJSONObject("location").getString("vicinity") + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"locationAddress\"" + crlf + crlf + data.getJSONObject("location").getString("vicinity") + crlf);
 
             request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"place_id\"" + crlf + crlf + jsonData.getJSONObject("location").getString("place_id") + crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"place_id\"" + crlf + crlf + data.getJSONObject("location").getString("place_id") + crlf);*/
 
-            request.writeBytes(twoHyphens + boundary + crlf);
-            request.writeBytes("Content-Disposition: form-data; name=\"mobile\"" + crlf + crlf + "mobile" + crlf);
-
-            request.writeBytes(twoHyphens + boundary + twoHyphens + crlf);
 
             request.flush();
             request.close();
-
-            System.out.println(boundary + crlf + "Content-Disposition: form-data; name=\"articleName\"" + crlf + crlf + jsonData.getString("articleName") + crlf);
 
             int responseCode = httpUrlConnection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK){

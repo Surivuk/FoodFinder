@@ -1,11 +1,14 @@
 package com.example.aleksandarx.foodfinder.data.model;
 
+import java.util.HashMap;
+
 /**
  * Created by aleksandarx on 7/2/16.
  */
 public class FoodModel {
 
     private long article_id;
+    private long db_id;
     private String article_location;
     private long article_location_id;
     private String article_location_name;
@@ -15,7 +18,30 @@ public class FoodModel {
     private String article_origin;
     private String article_image;
 
-    public FoodModel() {}
+    public static String[] FIELDS = {"user_id", "articleName", "articleDescription", "isFood", "origin", "foodType", "mealType", "locationName", "locationAddress", "place_id", "locationLat", "locationLng"};
+
+    private HashMap<String, String> attributes;
+
+    public FoodModel() {
+        this.attributes = new HashMap<>();
+        article_image = null;
+    }
+
+    public void addItem(String attributeName, String attributeValue){
+        for(int i = 0; i < FIELDS.length; i++){
+            if(FIELDS[i].equals(attributeName)){
+                attributes.put(attributeName, attributeValue);
+            }
+        }
+    }
+
+    public String getItem(String attributeName){
+        if(attributes.containsKey(attributeName)){
+            return attributes.get(attributeName);
+        }
+        else
+            return "ERROR";
+    }
 
     public FoodModel(long article_id, String article_location, long article_location_id, String article_location_name, String article_name, String article_description, String meal_type, String article_origin, String article_image) {
         this.article_id = article_id;
@@ -27,6 +53,15 @@ public class FoodModel {
         this.meal_type = meal_type;
         this.article_origin = article_origin;
         this.article_image = article_image;
+    }
+
+    public void setDb_id(long db_id) {
+        this.db_id = db_id;
+    }
+
+    public long getDb_id() {
+
+        return db_id;
     }
 
     public long getArticle_id() {
@@ -99,6 +134,21 @@ public class FoodModel {
 
     public void setArticle_image(String article_image) {
         this.article_image = article_image;
+    }
+
+    @Override
+    public String toString() {
+        return article_name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof FoodModel){
+            FoodModel tmp = (FoodModel) o;
+            if(article_id == tmp.getArticle_id())
+                return true;
+        }
+        return false;
     }
 }
 

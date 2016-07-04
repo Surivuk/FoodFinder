@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_sign_out:
                 UserPreferences.removePreference(MainActivity.this, UserPreferences.USER_USERNAME);
+                UserPreferences.removePreference(MainActivity.this, UserPreferences.USER_ID);
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 return true;
             case R.id.menu_bluetooth:

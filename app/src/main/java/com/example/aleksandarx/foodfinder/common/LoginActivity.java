@@ -132,8 +132,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
         if(!UserPreferences.getPreference(LoginActivity.this, UserPreferences.USER_USERNAME).equals(UserPreferences.PREFERENCE_DEFAULT_ERROR)) {
-            startMainActivity();
-            finish();
+            if(!UserPreferences.getPreference(LoginActivity.this, UserPreferences.USER_ID).equals(UserPreferences.PREFERENCE_DEFAULT_ERROR)) {
+                startMainActivity();
+                finish();
+            }
         }
     }
 
@@ -404,8 +406,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             try {
                 // Simulate network access.
-                if(HttpHelper.loginHeroku(mEmail, mPassword))
+                String id = HttpHelper.loginHeroku(mEmail, mPassword);
+                if(!id.equals("ERROR")) {
                     UserPreferences.setPreference(LoginActivity.this, UserPreferences.USER_USERNAME, mEmail);
+                    UserPreferences.setPreference(LoginActivity.this, UserPreferences.USER_ID, id);
+                }
                 else
                     return false;
             } catch (Exception e) {

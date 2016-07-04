@@ -11,6 +11,7 @@ public class UserPreferences {
     public static String PREFERENCE_DEFAULT_ERROR = "VALUE NOT FOUND";
 
     public static String USER_USERNAME = "USER_USERNAME";
+    public static String USER_ID = "USER_USERNAME";
 
 
     public static boolean setPreference(Context activityContext, String key, String value){
@@ -29,5 +30,6 @@ public class UserPreferences {
         SharedPreferences sharedpreferences = activityContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.remove(key);
+        editor.commit();
     }
 }
