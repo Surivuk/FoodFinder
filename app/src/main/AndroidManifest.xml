@@ -6,10 +6,14 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -43,7 +47,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".common.BluetoothActivity" />
+
+       <!-- <activity android:name=".bluetooth.BluetoothMainActivity" /> -->
         <activity android:name=".common.FoodArticlesActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -56,6 +61,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.aleksandarx.foodfinder.common.FoodArticlesActivity" />
         </activity>
+
+        <activity android:name=".bluetooth.DeviceListActivity" />
+        <activity android:name=".bluetooth.BluetoothMainActivity" />
+        <activity android:name=".common.SocketActivity" />
+        <activity android:name=".common.SettingsActivity"></activity>
+        <service android:name=".sync.BackgroundService"></service>
+        <receiver android:name=".sync.AlarmReceiver"></receiver>
     </application>
 
 </manifest>
