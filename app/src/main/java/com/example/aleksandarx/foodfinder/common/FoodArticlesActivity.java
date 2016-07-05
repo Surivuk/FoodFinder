@@ -57,11 +57,9 @@ public class FoodArticlesActivity extends AppCompatActivity {
         thread.submit(new Runnable() {
             @Override
             public void run() {
-                boolean tmp = HttpHelper.getMyFood(UserPreferences.getPreference(FoodArticlesActivity.this, UserPreferences.USER_ID));
-                if(tmp)
-                    updateGUI(db.readAll());
-                else
-                    guiNotifyUser("NERADI");
+                db.open();
+                updateGUI(db.readAll());
+                db.close();
             }
         });
     }
@@ -83,7 +81,12 @@ public class FoodArticlesActivity extends AppCompatActivity {
                 listV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Toast.makeText(FoodArticlesActivity.this, listValues.get(position).toString(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(FoodArticlesActivity.this, listValues.get(position).toString(), Toast.LENGTH_SHORT).show();
+                        Intent i = new Intent(FoodArticlesActivity.this, FoodViewActivity.class);
+                        FoodModel model = (FoodModel) parent.getAdapter().getItem(position);
+                        i.putExtra("id", model.getArticle_id());
+                        startActivity(i);
+                        finish();
                     }
                 });
             }

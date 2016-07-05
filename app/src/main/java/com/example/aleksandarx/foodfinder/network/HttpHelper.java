@@ -1,6 +1,10 @@
 package com.example.aleksandarx.foodfinder.network;
 
+import android.content.Context;
+
 import com.example.aleksandarx.foodfinder.data.model.FoodModel;
+import com.example.aleksandarx.foodfinder.data.sqlite.DBAdapter;
+import com.example.aleksandarx.foodfinder.data.sqlite.FoodTable;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -25,7 +29,7 @@ import java.util.List;
  * Created by Darko on 27.06.2016.
  */
 public class HttpHelper {
-    private static String localServer = "http://192.168.1.15:8081/";
+    private static String localServer = "http://192.168.1.7:8081/";
     private static String herokuLive = "http://food-finder-app.herokuapp.com/";
     private static String server = herokuLive;
     public static String signUpHeroku(String username,String password) {
@@ -93,7 +97,7 @@ public class HttpHelper {
         HttpURLConnection conn = null;
         String ret = "ERROR";
         try {
-            conn = SetupConnection(localServer + "signinMobile", 10000, 15000, "POST","application/json; charset=UTF-8","application/json");
+            conn = SetupConnection(herokuLive + "signinMobile", 10000, 15000, "POST","application/json; charset=UTF-8","application/json");
 
             JSONObject data = new JSONObject();
             data.put("username", username);
@@ -170,11 +174,11 @@ public class HttpHelper {
 
     }
 
-    public static boolean getMyFood(String id){
+    public static boolean getMyFood(String id, Context context){
         HttpURLConnection conn = null;
         boolean ret = false;
         try {
-            conn = SetupConnection(localServer + "articlesMobile?id="+id, 10000, 15000, "POST", "-1", "application/json");
+            conn = SetupConnection(herokuLive + "articlesMobile?id="+id, 10000, 15000, "POST", "-1", "application/json");
             //conn.setRequestProperty("id", id);
 
             OutputStream os = conn.getOutputStream();
@@ -191,17 +195,42 @@ public class HttpHelper {
             if (responseCode == HttpURLConnection.HTTP_OK){
                 String reader = inputStreamToString(conn.getInputStream());
                 JSONArray array = new JSONArray(reader);
+                DBAdapter db = DBAdapter.createAdapter(context);
+                db.open();
+                List<Object> tmpList = db.readAll();
+                db.close();
+                List<Long> ids = new ArrayList<>();
+                for(int i = 0; i < tmpList.size(); i++){
+                    FoodModel model = (FoodModel)tmpList.get(i);
+                    ids.add(model.getDb_id());
+                }
                 for(int i = 0; i < array.length(); i++){
                     JSONObject json = array.getJSONObject(i);
-                    FoodModel model = new FoodModel();
-                    model.addItem("user_id", json.getString("article_user"));
-                    model.addItem("articleName", json.getString("article_name"));
-                    model.addItem("origin", json.getString("article_origin"));
-                    model.addItem("foodType", json.getString("food_type"));
-                    model.addItem("locationName", json.getString("restaurant_name"));
-                    model.addItem("locationAddress", json.getString("restaurant_address"));
-                    model.addItem("place_id", json.getString("restaurant_google_id"));
-                    model.setDb_id(Long.parseLong(json.getString("article_id")));
+                    boolean next = true;
+                    Long tmp = json.getLong("article_id");
+                    for(int j = 0; j < ids.size(); j++){
+                        if(ids.get(j) == tmp) {
+                            next = false;
+                            break;
+                        }
+                    }
+                    if(next){
+                        FoodModel model = new FoodModel();
+                        model.addItem("user_id", json.getString("article_user"));
+                        model.addItem("articleName", json.getString("article_name"));
+                        model.addItem("origin", json.getString("article_origin"));
+                        model.addItem("foodType", json.getString("food_type"));
+                        model.addItem("locationName", json.getString("restaurant_name"));
+                        model.addItem("locationAddress", json.getString("restaurant_address"));
+                        model.addItem("place_id", json.getString("restaurant_google_id"));
+                        model.addItem("mealType", json.getString("meal_type"));
+                        model.addItem("articleDescription", json.getString("article_description"));
+                        model.setDb_id(Long.parseLong(json.getString("article_id")));
+                        model.setArticle_image(herokuLive + "image?id=" + json.getString("article_id"));
+                        db.open();
+                        db.insert(FoodTable.getTableName(), model);
+                        db.close();
+                    }
                 }
                 ret = true;
             }
@@ -224,7 +253,7 @@ public class HttpHelper {
 
         try{
             HttpURLConnection httpUrlConnection = null;
-            URL url = new URL("http://192.168.1.15:8081/newFood");
+            URL url = new URL(herokuLive + "newFood");
             httpUrlConnection = (HttpURLConnection) url.openConnection();
             httpUrlConnection.setUseCaches(false);
             httpUrlConnection.setDoOutput(true);
@@ -252,7 +281,7 @@ public class HttpHelper {
             for(int i = 0; i < tmpFields.length; i++){
                 if(data.containsKey(tmpFields[i])){
                     request.writeBytes(twoHyphens + boundary + crlf);
-                    request.writeBytes("Content-Disposition: form-data; name=\"" + tmpFields[i] + "\"" + crlf + crlf + data.get("articleName") + crlf);
+                    request.writeBytes("Content-Disposition: form-data; name=\"" + tmpFields[i] + "\"" + crlf + crlf + data.get(tmpFields[i]) + crlf);
                 }
             }
 

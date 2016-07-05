@@ -64,6 +64,7 @@ public class FoodTable {
         }
         if(input.getArticle_image() != null)
             val.put(ARTICLE_IMAGE, input.getArticle_image());
+        val.put(DB_ID, input.getDb_id());
         return val;
     }
 
@@ -118,7 +119,7 @@ public class FoodTable {
         vals.add(cursor.getString(cursor.getColumnIndex(ARTICLE_USER)));
         vals.add(cursor.getString(cursor.getColumnIndex(ARTICLE_NAME)));
         vals.add(cursor.getString(cursor.getColumnIndex(ARTICLE_DESCRIPTION)));
-        vals.add(cursor.getString(cursor.getColumnIndex(""))); // isFood
+        vals.add("xxxxxxxx"); // isFood
         vals.add(cursor.getString(cursor.getColumnIndex(ARTICLE_ORIGIN)));
         vals.add(cursor.getString(cursor.getColumnIndex(ARTICLE_FOOD_TYPE)));
         vals.add(cursor.getString(cursor.getColumnIndex(MEAL_TYPE)));
@@ -135,6 +136,7 @@ public class FoodTable {
             model.addItem(tmp[i], vals.get(i));
         }
         model.setArticle_image(cursor.getString(cursor.getColumnIndex(ARTICLE_IMAGE)));
+        model.setDb_id(Long.parseLong(cursor.getString(cursor.getColumnIndex(DB_ID))));
         return model;
     }
 

@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import com.example.aleksandarx.foodfinder.network.HttpHelper;
+import com.example.aleksandarx.foodfinder.share.UserPreferences;
+
 /**
  * Created by Darko on 03.07.2016.
  */
@@ -30,7 +33,7 @@ public class BackgroundService extends Service {
     private Runnable myTask = new Runnable() {
         @Override
         public void run() {
-            // do something here
+            HttpHelper.getMyFood(UserPreferences.getPreference(context, UserPreferences.USER_ID), context);
             System.out.println("BACKGROUND SERVICE RUNNING");
             stopSelf();
         }

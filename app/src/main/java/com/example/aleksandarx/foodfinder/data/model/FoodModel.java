@@ -138,7 +138,7 @@ public class FoodModel {
 
     @Override
     public String toString() {
-        return article_name;
+        return this.getItem("articleName");
     }
 
     @Override
