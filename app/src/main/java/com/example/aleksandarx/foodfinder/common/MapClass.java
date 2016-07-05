@@ -59,13 +59,7 @@ public class MapClass implements OnMapReadyCallback {
         map.getUiSettings().setCompassEnabled(true);
 
 
-        ExecutorService thread = Executors.newSingleThreadExecutor();
-        thread.submit(new Runnable() {
-            @Override
-            public void run() {
-                updateMapPlaces(HttpHelper.findPlacesAroundYou(0,0));
-            }
-        });
+
 
 
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -73,6 +67,15 @@ public class MapClass implements OnMapReadyCallback {
             LocationListener locationListener = new LocationListener() {
                 public void onLocationChanged(final Location location) {
                     LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+
+                    ExecutorService thread = Executors.newSingleThreadExecutor();
+                    thread.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateMapPlaces(HttpHelper.findPlacesAroundYou(location.getLatitude(),location.getLongitude()));
+                        }
+                    });
+
                     Toast.makeText(activity, "UPDATE", Toast.LENGTH_SHORT).show();
                     MarkerOptions m = new MarkerOptions().position(pos);
                     map.addMarker(m);
