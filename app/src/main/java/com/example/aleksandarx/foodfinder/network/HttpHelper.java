@@ -134,8 +134,8 @@ public class HttpHelper {
             conn = SetupConnection("http://food-finder-app.herokuapp.com/placesAround",10000,15000,"POST","application/json; charset=UTF-8","application/json");
 
             JSONObject data = new JSONObject();
-            data.put("lat", 43.541115);
-            data.put("lng", 21.711991);
+            data.put("lat", lat);
+            data.put("lng", lng);
 
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 
