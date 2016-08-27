@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.aleksandarx.foodfinder.common.logger;
+package com.example.aleksandarx.foodfinder.view.logger;
 
 /**
  * Helper class for a list (or tree) of LoggerNodes.

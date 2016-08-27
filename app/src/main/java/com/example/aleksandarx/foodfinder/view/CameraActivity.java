@@ -1,13 +1,11 @@
-package com.example.aleksandarx.foodfinder.common;
+package com.example.aleksandarx.foodfinder.view;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.example.aleksandarx.foodfinder.R;
 

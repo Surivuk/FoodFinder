@@ -29,7 +29,7 @@
  * limitations under the License.
  */
 
-package com.example.aleksandarx.foodfinder.common.logger;
+package com.example.aleksandarx.foodfinder.view.logger;
 
 import android.graphics.Typeface;
 import android.os.Bundle;

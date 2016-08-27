@@ -14,13 +14,13 @@
 * limitations under the License.
 */
 
-package com.example.aleksandarx.foodfinder.common;
+package com.example.aleksandarx.foodfinder.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.aleksandarx.foodfinder.common.logger.Log;
-import com.example.aleksandarx.foodfinder.common.logger.LogWrapper;
+import com.example.aleksandarx.foodfinder.view.logger.Log;
+import com.example.aleksandarx.foodfinder.view.logger.LogWrapper;
 
 
 /**

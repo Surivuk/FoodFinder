@@ -2,7 +2,6 @@ package com.example.aleksandarx.foodfinder.bluetooth;
 
 import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,12 +9,11 @@ import android.widget.TextView;
 import android.widget.ViewAnimator;
 
 import com.example.aleksandarx.foodfinder.R;
-import com.example.aleksandarx.foodfinder.common.SampleActivityBase;
-import com.example.aleksandarx.foodfinder.common.logger.Log;
-import com.example.aleksandarx.foodfinder.common.logger.LogFragment;
-import com.example.aleksandarx.foodfinder.common.logger.LogWrapper;
-import com.example.aleksandarx.foodfinder.common.logger.MessageOnlyLogFilter;
-import com.google.android.gms.identity.intents.AddressConstants;
+import com.example.aleksandarx.foodfinder.view.SampleActivityBase;
+import com.example.aleksandarx.foodfinder.view.logger.Log;
+import com.example.aleksandarx.foodfinder.view.logger.LogFragment;
+import com.example.aleksandarx.foodfinder.view.logger.LogWrapper;
+import com.example.aleksandarx.foodfinder.view.logger.MessageOnlyLogFilter;
 
 public class BluetoothMainActivity extends SampleActivityBase {
 

@@ -1,4 +1,4 @@
-package com.example.aleksandarx.foodfinder.common;
+package com.example.aleksandarx.foodfinder.view;
 
 import android.app.Activity;
 import android.content.Intent;

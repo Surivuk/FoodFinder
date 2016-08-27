@@ -1,9 +1,8 @@
-package com.example.aleksandarx.foodfinder.common;
+package com.example.aleksandarx.foodfinder.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -39,14 +38,11 @@ import com.example.aleksandarx.foodfinder.network.HttpHelper;
 import com.example.aleksandarx.foodfinder.share.UserPreferences;
 
 import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -100,6 +96,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 pickImage();
             }
         });*/
+
+        TextView signUpButton = (TextView) findViewById(R.id.sing_up_button);
+        if(signUpButton != null)
+            signUpButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+                    finish();
+                }
+            });
 
 
 

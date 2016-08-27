@@ -1,18 +1,17 @@
-package com.example.aleksandarx.foodfinder.common;
+package com.example.aleksandarx.foodfinder.view;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Display;
-import android.view.WindowManager;
 import android.webkit.WebView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.aleksandarx.foodfinder.R;
 import com.example.aleksandarx.foodfinder.data.model.FoodModel;
 import com.example.aleksandarx.foodfinder.data.sqlite.DBAdapter;
+import com.squareup.picasso.Picasso;
 
 public class FoodViewActivity extends AppCompatActivity {
 
@@ -24,7 +23,7 @@ public class FoodViewActivity extends AppCompatActivity {
     private TextView articleLocation;
     private TextView articleLocationAddress;
     private TextView articleDescription;
-    private WebView img;
+    private ImageView img;
     private DBAdapter dbAdapter;
 
 
@@ -40,7 +39,7 @@ public class FoodViewActivity extends AppCompatActivity {
         articleLocation = (TextView) findViewById(R.id.article_location);
         articleLocationAddress = (TextView) findViewById(R.id.article_location_address);
         articleDescription = (TextView) findViewById(R.id.article_description);
-        img = (WebView) findViewById(R.id.webView);
+        img = (ImageView) findViewById(R.id.food_image_view);
 
         dbAdapter = DBAdapter.createAdapter(FoodViewActivity.this);
 
@@ -56,12 +55,13 @@ public class FoodViewActivity extends AppCompatActivity {
         FoodModel model = (FoodModel) dbAdapter.read(id);
         dbAdapter.close();
 
-        //WebView web = new WebView(this);
-        img.setPadding(50, 0, 0, 0);
-        img.setInitialScale(40);
-        img.setBackgroundColor(Color.BLACK);
 
-        img.loadUrl(model.getArticle_image());
+        Picasso.with(FoodViewActivity.this)
+                .load("https://food-finder-app.herokuapp.com/image?id=" + model.getArticle_id())
+                .placeholder(R.drawable.ic_cached_black_24dp)
+                .error(R.drawable.ic_do_not_disturb_black_24dp)
+                .into(img);
+
         articleName.setText(model.getItem("articleName"));
         articleDescription.setText(model.getItem("articleDescription"));
         articleOrigin.setText(model.getItem("origin"));

@@ -1,13 +1,9 @@
-package com.example.aleksandarx.foodfinder.common;
+package com.example.aleksandarx.foodfinder.view;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,17 +11,13 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.aleksandarx.foodfinder.R;
 import com.example.aleksandarx.foodfinder.data.model.FoodModel;
 import com.example.aleksandarx.foodfinder.data.sqlite.DBAdapter;
-import com.example.aleksandarx.foodfinder.network.HttpHelper;
-import com.example.aleksandarx.foodfinder.share.UserPreferences;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -86,7 +78,6 @@ public class FoodArticlesActivity extends AppCompatActivity {
                         FoodModel model = (FoodModel) parent.getAdapter().getItem(position);
                         i.putExtra("id", model.getArticle_id());
                         startActivity(i);
-                        finish();
                     }
                 });
             }
