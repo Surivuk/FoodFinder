@@ -5,7 +5,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import com.example.aleksandarx.foodfinder.view.logger.Log;
+
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -30,13 +33,19 @@ public class UserNetworkController {
     private static OkHttpClient client = new OkHttpClient();
 
 
-    public void test(String url, String json) throws IOException{
+    public static JSONObject getProfileInfo(String url, String json) throws IOException, JSONException {
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
                 .build();
         Response response = client.newCall(request).execute();
+        if (!response.isSuccessful())
+            throw new IOException("Unexpected code " + response);
+
+        //System.out.println(response.body().string());
+
+        return new JSONArray(response.body().string()).getJSONObject(0);
     }
 
 

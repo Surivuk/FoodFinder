@@ -415,6 +415,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 String id = HttpHelper.loginHeroku(mEmail, mPassword);
                 if(!id.equals("ERROR")) {
                     UserPreferences.setPreference(LoginActivity.this, UserPreferences.USER_USERNAME, mEmail);
+                    UserPreferences.setPreference(LoginActivity.this, UserPreferences.USER_PASSWORD, mPassword);
                     UserPreferences.setPreference(LoginActivity.this, UserPreferences.USER_ID, id);
                 }
                 else

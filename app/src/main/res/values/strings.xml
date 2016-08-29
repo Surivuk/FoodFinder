@@ -133,6 +133,7 @@
     <string name="sign_up_phone_number">Phone number:</string>
     <string name="sign_up_photo">Profile photo:</string>
     <string name="sign_up_profile_button">Take Photo</string>
+    <string name="menu_view_profile">View Profile</string>
 
 </resources>
 

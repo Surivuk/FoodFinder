@@ -1,6 +1,10 @@
 package com.example.aleksandarx.foodfinder.view;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -8,6 +12,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.aleksandarx.foodfinder.R;
@@ -37,13 +43,13 @@ public class MapClass implements OnMapReadyCallback {
     private Handler guiThread;
     private MarkerOptions personsMarker = null;
 
+
     public MapClass(int mapId, MainActivity act){
         mapReady = false;
         activity = act;
         SupportMapFragment mapFragment = (SupportMapFragment) act.getSupportFragmentManager()
                 .findFragmentById(mapId);
         mapFragment.getMapAsync(this);
-
     }
 
     @Override
@@ -62,7 +68,7 @@ public class MapClass implements OnMapReadyCallback {
 
 
 
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        /*if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager locationManager = (LocationManager) activity.getSystemService(activity.LOCATION_SERVICE);
             LocationListener locationListener = new LocationListener() {
                 public void onLocationChanged(final Location location) {
@@ -102,7 +108,7 @@ public class MapClass implements OnMapReadyCallback {
             {
                 map.addMarker(personsMarker);
             }
-        }
+        }*/
 
     }
     private void updateMapPlaces(final List<MarkerOptions> markers)
@@ -125,6 +131,10 @@ public class MapClass implements OnMapReadyCallback {
             personsMarker.position(new LatLng(lat,lng));
             personsMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_custom_pin));
             return mapReady;
+    }
+
+    public void changeMyPin(LatLng latLng){
+        map.addMarker(new MarkerOptions().position(latLng));
     }
 }
 

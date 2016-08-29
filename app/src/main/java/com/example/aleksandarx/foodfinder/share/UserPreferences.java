@@ -11,7 +11,8 @@ public class UserPreferences {
     public static String PREFERENCE_DEFAULT_ERROR = "VALUE NOT FOUND";
 
     public static String USER_USERNAME = "USER_USERNAME";
-    public static String USER_ID = "USER_USERNAME";
+    public static String USER_PASSWORD = "USER_PASSWORD";
+    public static String USER_ID = "USER_ID";
 
 
     public static boolean setPreference(Context activityContext, String key, String value){

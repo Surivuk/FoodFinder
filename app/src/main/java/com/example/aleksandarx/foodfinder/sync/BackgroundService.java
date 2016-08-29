@@ -3,6 +3,7 @@ package com.example.aleksandarx.foodfinder.sync;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
@@ -17,10 +18,20 @@ public class BackgroundService extends Service {
     private boolean isRunning;
     private Context context;
     private Thread backgroundThread;
-    @Nullable
+    private LocationController locationController;
+    private IBinder mBinder = new LocalBinder();
+
+
+
+    public class LocalBinder extends Binder {
+        public BackgroundService getServerInstance() {
+            return BackgroundService.this;
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
 
     @Override
@@ -29,7 +40,9 @@ public class BackgroundService extends Service {
         this.context = this;
         this.isRunning = false;
         this.backgroundThread = new Thread(myTask);
+        locationController = LocationController.getLocationController(context);
     }
+
     private Runnable myTask = new Runnable() {
         @Override
         public void run() {
@@ -38,15 +51,19 @@ public class BackgroundService extends Service {
             stopSelf();
         }
     };
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+        System.out.println("BACKGROUND SERVICE IS DESTROY");
         this.isRunning = false;
-
+        /*if(locationController != null)
+            locationController.stopLocationController();*/
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        locationController.startLocationController();
         if(!isRunning)
         {
             this.isRunning = true;
@@ -54,4 +71,28 @@ public class BackgroundService extends Service {
         }
         return START_STICKY;
     }
+
+    public void startBackgroundService(){
+
+    }
+
+    public void setBackgroundService(){
+
+    }
 }
+
+/*
+
+protected ServiceConnection mServerConn = new ServiceConnection() {
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder binder) {
+        Log.d(LOG_TAG, "onServiceConnected");
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        Log.d(LOG_TAG, "onServiceDisconnected");
+    }
+}
+
+ */
