@@ -64,7 +64,7 @@ public class UserNetworkController {
 
         Request request = new Request.Builder()
                 .header("Authorization", "Client-ID " + IMGUR_CLIENT_ID)
-                .url("http://192.168.1.7:8081/signUp")
+                .url("https://food-finder-app.herokuapp.com/signUp")
                 .post(requestBody)
                 .build();
 

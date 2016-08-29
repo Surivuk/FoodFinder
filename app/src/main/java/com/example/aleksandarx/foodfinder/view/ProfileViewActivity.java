@@ -55,7 +55,7 @@ public class ProfileViewActivity extends AppCompatActivity {
         img = (ImageView) findViewById(R.id.profile_view_profile_image);
 
         Picasso.with(ProfileViewActivity.this)
-                .load("http://192.168.1.7:8081/profileImage?id=" + UserPreferences.getPreference(ProfileViewActivity.this, UserPreferences.USER_ID))
+                .load("https://food-finder-app.herokuapp.com/profileImage?id=" + UserPreferences.getPreference(ProfileViewActivity.this, UserPreferences.USER_ID))
                 .placeholder(R.drawable.ic_cached_black_24dp)
                 .error(R.drawable.ic_do_not_disturb_black_24dp)
                 .into(img);
@@ -99,7 +99,7 @@ public class ProfileViewActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             try {
                 if(inputJson != null)
-                    data = UserNetworkController.getProfileInfo("http://192.168.1.7:8081/profile", inputJson.toString());
+                    data = UserNetworkController.getProfileInfo("https://food-finder-app.herokuapp.com/profile", inputJson.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
                 data = null;
