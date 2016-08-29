@@ -51,14 +51,15 @@ public class MainActivity extends AppCompatActivity {
         myMap = new MapClass(R.id.map, MainActivity.this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, PlacePickerActivity.class);
-                startActivity(intent);
+        if(fab != null)
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, PlacePickerActivity.class);
+                    startActivity(intent);
 
-            }
-        });
+                }
+            });
 
         Intent invokingIntent = getIntent();
         Bundle personBundle = invokingIntent.getExtras();

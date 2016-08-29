@@ -17,6 +17,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.aleksandarx.foodfinder.R;
+import com.example.aleksandarx.foodfinder.socket.SocketService;
 import com.example.aleksandarx.foodfinder.sync.AlarmReceiver;
 import com.example.aleksandarx.foodfinder.sync.BackgroundService;
 
@@ -24,36 +25,27 @@ import java.util.HashMap;
 
 public class SettingsActivity extends AppCompatActivity {
 
-
-    private Context context;
-    private Switch serviceSwitch;
-    private TextView serviceStatus;
     private Intent service;
-
     private HashMap<Boolean, String> serviceState;
-
-    /*private BackgroundService mService;
-    private boolean mBounded;*/
+    private Switch socketServiceSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
-        this.context = this;
-        serviceSwitch = (Switch) findViewById(R.id.service_switch);
-        serviceStatus = (TextView) findViewById(R.id.service_status);
+        setContentView(R.layout.find_more_people);
+
+        socketServiceSwitch = (Switch) findViewById(R.id.socket_service_switch);
 
         serviceState = new HashMap<>();
         serviceState.put(true, "Service is turned on.");
         serviceState.put(false, "Service is turned off.");
 
-        service = new Intent(this, BackgroundService.class);
+        service = new Intent(SettingsActivity.this, SocketService.class);
 
-
-        serviceSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        socketServiceSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                serviceStatus.setText(serviceState.get(isChecked));
+                socketServiceSwitch.setText(serviceState.get(isChecked));
                 if(isChecked)
                     startService(service);
                 else
@@ -62,19 +54,19 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         boolean isChecked = false;
-        if(isMyServiceRunning(BackgroundService.class))
+        if(isMyServiceRunning(SocketService.class))
             isChecked = true;
 
-        serviceSwitch.setChecked(isChecked);
-        serviceStatus.setText(serviceState.get(isChecked));
+        socketServiceSwitch.setChecked(isChecked);
+        socketServiceSwitch.setText(serviceState.get(isChecked));
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
         //bindService(mIntent, mServerConn, BIND_AUTO_CREATE);
     }
+
 
     /*private ServiceConnection mServerConn = new ServiceConnection() {
         @Override

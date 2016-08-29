@@ -3,6 +3,7 @@ package com.example.aleksandarx.foodfinder.view;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -21,9 +22,8 @@ import android.widget.Toast;
 
 import com.example.aleksandarx.foodfinder.R;
 import com.example.aleksandarx.foodfinder.network.PersonModel;
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Ack;
-import com.github.nkzawa.socketio.client.IO;
+import com.example.aleksandarx.foodfinder.socket.SocketReceiver;
+import com.example.aleksandarx.foodfinder.socket.SocketService;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -31,12 +31,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SocketActivity extends AppCompatActivity {
 
+    private SocketReceiver receiver;
     private static final int GPS_TIME_INTERVAL = 500; // get gps location every 1 min
     private static final int GPS_DISTANCE = 10; // set the distance value in meter
     private LatLng currentPosition;
@@ -48,63 +48,63 @@ public class SocketActivity extends AppCompatActivity {
     private ArrayAdapter<String> peopleAdapter;
     private Button joinGroupButton;
     private Button leaveGroupButton;
-    private String connectionID;
+    //private String connectionID;
     private String foodType;
     private ArrayList<String> foodTypes;
     private String liveServer = "http://food-finder-app.herokuapp.com/";
     //private String darkoServer = "http://192.168.1.15:8081";
     private HashMap<String,LatLng> positions;
 
-    {
-        try {
-            mSocket = IO.socket(liveServer);
-            socketConnected = true;
-        } catch (URISyntaxException e)
-        {
-            mSocket = null;
-            socketConnected = false;
-        }
-    }
+//    {
+//        try {
+//            mSocket = IO.socket(liveServer);
+//            socketConnected = true;
+//        } catch (URISyntaxException e)
+//        {
+//            mSocket = null;
+//            socketConnected = false;
+//        }
+//    }
     private Handler guiThread;
     private Context context;
 
 
-    private Emitter.Listener onPlace = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            JSONArray people = (JSONArray) args[0];
-
-            ArrayList<String> peoplesName = new ArrayList<>();
-
-            try {
-                for(int i = 0 ; i < people.length(); i ++)
-                {
-                    JSONObject person = people.getJSONObject(i);
-                    if(foodTypes.contains(person.getString("foodType")) && !connectionID.equals(person.get("connectionID")) && !peoplesName.contains(person.get("connectionID")))
-                    {
-                        peoplesName.add(person.getString("connectionID"));
-                        LatLng position = new LatLng(person.getDouble("latitude"),person.getDouble("longitude"));
-
-                        positions.put(person.getString("connectionID"),position);
-
-                    }
-
-                }
-
-            } catch (JSONException e) {
-                return;
-            }
-            guiNotifyUser(peoplesName);
-        }
-    };
-    private Emitter.Listener onMessage = new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-            connectionID = (String) args[0];
-            guiToastNotify("Recieved id: "+connectionID);
-
-        }
-    };
+//    private Emitter.Listener onPlace = new Emitter.Listener() {
+//        @Override
+//        public void call(Object... args) {
+//            JSONArray people = (JSONArray) args[0];
+//
+//            ArrayList<String> peoplesName = new ArrayList<>();
+//
+//            try {
+//                for(int i = 0 ; i < people.length(); i ++)
+//                {
+//                    JSONObject person = people.getJSONObject(i);
+//                    if(foodTypes.contains(person.getString("foodType")) && !connectionID.equals(person.get("connectionID")) && !peoplesName.contains(person.get("connectionID")))
+//                    {
+//                        peoplesName.add(person.getString("connectionID"));
+//                        LatLng position = new LatLng(person.getDouble("latitude"),person.getDouble("longitude"));
+//
+//                        positions.put(person.getString("connectionID"),position);
+//
+//                    }
+//
+//                }
+//
+//            } catch (JSONException e) {
+//                return;
+//            }
+//            guiNotifyUser(peoplesName);
+//        }
+//    };
+//    private Emitter.Listener onMessage = new Emitter.Listener() {
+//        @Override
+//        public void call(Object... args) {
+//            connectionID = (String) args[0];
+//            guiToastNotify("Recieved id: "+connectionID);
+//
+//        }
+//    };
     private void guiToastNotify(final String message)
     {
         guiThread.post(new Runnable() {
@@ -167,11 +167,11 @@ public class SocketActivity extends AppCompatActivity {
 
 
 
-        mSocket.connect();
-
-
-        mSocket.on("message",onMessage);
-        mSocket.on("foodFriends",onPlace);
+//        mSocket.connect();
+//
+//
+//        mSocket.on("message",onMessage);
+//        mSocket.on("foodFriends",onPlace);
 
         foodOrigin = (Spinner) findViewById(R.id.food_types);
         adapter = ArrayAdapter.createFromResource(this, R.array.food_types, android.R.layout.simple_spinner_item);
@@ -204,10 +204,25 @@ public class SocketActivity extends AppCompatActivity {
         leaveGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSocket.emit("leaveGroup",new PersonModel(connectionID,foodOrigin.getSelectedItem().toString(),currentPosition.latitude,currentPosition.longitude));
+//                mSocket.emit("leaveGroup",new PersonModel(connectionID,foodOrigin.getSelectedItem().toString(),currentPosition.latitude,currentPosition.longitude));
+//
+//                foodTypes.remove(foodOrigin.getSelectedItem().toString());
+//
+//                foodType = "";
+//                peopleAdapter.clear();
+//                peopleAdapter.notifyDataSetInvalidated();
+
+                Intent intent = new Intent();
+                intent.setAction(SocketService.MY_COMMAND);
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("person",new PersonModel("",foodOrigin.getSelectedItem().toString(),currentPosition.latitude,currentPosition.longitude));
+                bundle.putInt("type",0);
+                intent.putExtras(bundle);
+                sendBroadcast(intent);
+
 
                 foodTypes.remove(foodOrigin.getSelectedItem().toString());
-
                 foodType = "";
                 peopleAdapter.clear();
                 peopleAdapter.notifyDataSetInvalidated();
@@ -226,19 +241,28 @@ public class SocketActivity extends AppCompatActivity {
                     Toast.makeText(context,"Location unknown.Turn GPS on and wait for position lock.",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                PersonModel data = new PersonModel(connectionID,foodType,currentPosition.latitude,currentPosition.longitude);
+                PersonModel data = new PersonModel("",foodType,currentPosition.latitude,currentPosition.longitude);
                 System.out.println(data.toString());
 
 
 
-                mSocket.emit("joinGroup", data , new Ack(){
+//                mSocket.emit("joinGroup", data , new Ack(){
+//
+//                    @Override
+//                    public void call(Object... args) {
+//                        guiToastNotify("Joined group.");
+//                    }
+//                });
 
-                    @Override
-                    public void call(Object... args) {
-                        guiToastNotify("Joined group.");
-                    }
-                });
+                Intent intent = new Intent();
+                intent.setAction(SocketService.MY_COMMAND);
 
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("person",data);
+                bundle.putInt("type",1);
+                intent.putExtras(bundle);
+
+                sendBroadcast(intent);
 
             }
         });
@@ -249,12 +273,83 @@ public class SocketActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart()
+    {
+        receiver = new SocketReceiver(){
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //int datapassed = intent.getIntExtra("DATAPASSED", 0);
+                int type = intent.getIntExtra("type",-7);
+                switch(type){
+                    case 0:
+                        //sending interested people
+                        String jsonArray = intent.getStringExtra("people");
+
+
+
+                        ArrayList<String> peoplesName = new ArrayList<>();
+
+                        try {
+                            JSONArray people = new JSONArray(jsonArray);
+                            for(int i = 0 ; i < people.length(); i ++)
+                            {
+                                JSONObject person = people.getJSONObject(i);
+                                if(foodTypes.contains(person.getString("foodType")) && !SocketService.connectionID.equals(person.get("connectionID")) && !peoplesName.contains(person.get("connectionID")))
+                                {
+                                    peoplesName.add(person.getString("connectionID"));
+                                    LatLng position = new LatLng(person.getDouble("latitude"),person.getDouble("longitude"));
+
+                                    positions.put(person.getString("connectionID"),position);
+
+                                }
+
+                            }
+
+                        } catch (JSONException e) {
+                            return;
+                        }
+                        guiNotifyUser(peoplesName);
+                        break;
+                    case 1:
+                        String connectionID = intent.getStringExtra("ID");
+                        guiToastNotify("Recieved id: "+connectionID);
+                        break;
+                    case -7:
+                        System.out.println("Invalid type, activity doesn't know what to do.");
+                        break;
+                }
+
+            }
+        };
+
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(SocketService.MY_ACTION);
+        registerReceiver(receiver, intentFilter);
+
+
+        //Start our own service
+        Intent intent = new Intent(SocketActivity.this,
+                SocketService.class);
+        startService(intent);
+
+        super.onStart();
+
+    }
+    @Override
+    protected void onStop()
+    {
+        //stopService(new Intent(SocketActivity.this,SocketService.class));
+        unregisterReceiver(receiver);
+        super.onStop();
+    }
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        mSocket.disconnect();
+       // mSocket.disconnect();
         //mSocket.off(foodType, onPlace);
-        mSocket.off("foodFriends",onPlace);
-        mSocket.off("message", onMessage);
+        //mSocket.off("foodFriends",onPlace);
+        //mSocket.off("message", onMessage);
     }
 }

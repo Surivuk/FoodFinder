@@ -15,7 +15,7 @@ import com.example.aleksandarx.foodfinder.share.UserPreferences;
  */
 public class BackgroundService extends Service {
 
-    private boolean isRunning;
+    public boolean isRunning;
     private Context context;
     private Thread backgroundThread;
     private LocationController locationController;
