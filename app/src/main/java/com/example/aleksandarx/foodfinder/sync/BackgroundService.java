@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 
 import com.example.aleksandarx.foodfinder.network.HttpHelper;
 import com.example.aleksandarx.foodfinder.share.UserPreferences;
@@ -55,7 +54,7 @@ public class BackgroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        System.out.println("BACKGROUND SERVICE IS DESTROY");
+        System.out.println("BACKGROUND SERVICE DESTROYED");
         this.isRunning = false;
         /*if(locationController != null)
             locationController.stopLocationController();*/
@@ -63,7 +62,7 @@ public class BackgroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        locationController.startLocationController();
+        //locationController.startLocationController();
         if(!isRunning)
         {
             this.isRunning = true;

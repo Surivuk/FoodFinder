@@ -11,12 +11,14 @@ public class PersonModel implements Parcelable {
     public String foodType;
     public double latitude;
     public double longitude;
-    public PersonModel(String cid,String ft,double lat,double lng)
+    public int ID;
+    public PersonModel(String cid,String ft,double lat,double lng,int id)
     {
         connectionID = cid;
         foodType = ft;
         latitude = lat;
         longitude = lng;
+        ID = id;
     }
 
     @Override
@@ -41,6 +43,7 @@ public class PersonModel implements Parcelable {
         dest.writeString(this.foodType);
         dest.writeDouble(this.latitude);
         dest.writeDouble(this.longitude);
+        dest.writeInt(this.ID);
     }
 
     protected PersonModel(Parcel in) {
@@ -48,9 +51,10 @@ public class PersonModel implements Parcelable {
         this.foodType = in.readString();
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
+        this.ID = in.readInt();
     }
 
-    public static final Parcelable.Creator<PersonModel> CREATOR = new Parcelable.Creator<PersonModel>() {
+    public static final Creator<PersonModel> CREATOR = new Creator<PersonModel>() {
         @Override
         public PersonModel createFromParcel(Parcel source) {
             return new PersonModel(source);
