@@ -1,33 +1,19 @@
 package com.example.aleksandarx.foodfinder.view;
 
-import android.Manifest;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.aleksandarx.foodfinder.R;
-import com.example.aleksandarx.foodfinder.network.HttpHelper;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -42,11 +28,15 @@ public class MapClass implements OnMapReadyCallback {
     private static final int GPS_DISTANCE = 100; // set the distance value in meter
     private Handler guiThread;
     private MarkerOptions personsMarker = null;
+    private Marker myPosition;
 
+
+    private HashMap<Integer,Marker> friendsMarkers = null;
 
     public MapClass(int mapId, MainActivity act){
         mapReady = false;
         activity = act;
+        friendsMarkers = new HashMap<>();
         SupportMapFragment mapFragment = (SupportMapFragment) act.getSupportFragmentManager()
                 .findFragmentById(mapId);
         mapFragment.getMapAsync(this);
@@ -54,7 +44,10 @@ public class MapClass implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mapReady = true;
+
+
         map = googleMap;
         guiThread = new Handler();
 
@@ -132,9 +125,25 @@ public class MapClass implements OnMapReadyCallback {
             personsMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_custom_pin));
             return mapReady;
     }
+    public void tryAddFriend(Integer id,String name,double lat,double lng)
+    {
+        //check if exists
+        Marker friendMarker = friendsMarkers.get(id);
+        if(friendMarker != null) friendMarker.remove();
 
+        friendMarker = map.addMarker(new MarkerOptions()
+                                            .position(new LatLng(lat, lng))
+                                            .title(name));
+        friendsMarkers.put(id,friendMarker);
+    }
     public void changeMyPin(LatLng latLng){
-        map.addMarker(new MarkerOptions().position(latLng));
+        if(map != null)
+        {
+            if(myPosition != null) myPosition.remove();
+            myPosition = map.addMarker(new MarkerOptions().position(latLng));
+
+        }
+
     }
 }
 

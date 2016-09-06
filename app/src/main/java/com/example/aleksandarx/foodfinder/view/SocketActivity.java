@@ -1,16 +1,10 @@
 package com.example.aleksandarx.foodfinder.view;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.aleksandarx.foodfinder.R;
 import com.example.aleksandarx.foodfinder.network.PersonModel;
+import com.example.aleksandarx.foodfinder.share.UserPreferences;
 import com.example.aleksandarx.foodfinder.socket.SocketReceiver;
 import com.example.aleksandarx.foodfinder.socket.SocketService;
 import com.github.nkzawa.socketio.client.Socket;
@@ -55,56 +50,10 @@ public class SocketActivity extends AppCompatActivity {
     //private String darkoServer = "http://192.168.1.15:8081";
     private HashMap<String,LatLng> positions;
 
-//    {
-//        try {
-//            mSocket = IO.socket(liveServer);
-//            socketConnected = true;
-//        } catch (URISyntaxException e)
-//        {
-//            mSocket = null;
-//            socketConnected = false;
-//        }
-//    }
     private Handler guiThread;
     private Context context;
 
 
-//    private Emitter.Listener onPlace = new Emitter.Listener() {
-//        @Override
-//        public void call(Object... args) {
-//            JSONArray people = (JSONArray) args[0];
-//
-//            ArrayList<String> peoplesName = new ArrayList<>();
-//
-//            try {
-//                for(int i = 0 ; i < people.length(); i ++)
-//                {
-//                    JSONObject person = people.getJSONObject(i);
-//                    if(foodTypes.contains(person.getString("foodType")) && !connectionID.equals(person.get("connectionID")) && !peoplesName.contains(person.get("connectionID")))
-//                    {
-//                        peoplesName.add(person.getString("connectionID"));
-//                        LatLng position = new LatLng(person.getDouble("latitude"),person.getDouble("longitude"));
-//
-//                        positions.put(person.getString("connectionID"),position);
-//
-//                    }
-//
-//                }
-//
-//            } catch (JSONException e) {
-//                return;
-//            }
-//            guiNotifyUser(peoplesName);
-//        }
-//    };
-//    private Emitter.Listener onMessage = new Emitter.Listener() {
-//        @Override
-//        public void call(Object... args) {
-//            connectionID = (String) args[0];
-//            guiToastNotify("Recieved id: "+connectionID);
-//
-//        }
-//    };
     private void guiToastNotify(final String message)
     {
         guiThread.post(new Runnable() {
@@ -140,7 +89,7 @@ public class SocketActivity extends AppCompatActivity {
 
         currentPosition = new LatLng(0,0);
 
-        if (ContextCompat.checkSelfPermission(SocketActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        /*if (ContextCompat.checkSelfPermission(SocketActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager locationManager = (LocationManager) SocketActivity.this.getSystemService(SocketActivity.this.LOCATION_SERVICE);
             LocationListener locationListener = new LocationListener() {
                 public void onLocationChanged(final Location location) {
@@ -163,15 +112,8 @@ public class SocketActivity extends AppCompatActivity {
             };
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_TIME_INTERVAL, GPS_DISTANCE, locationListener);
-        }
+        }*/
 
-
-
-//        mSocket.connect();
-//
-//
-//        mSocket.on("message",onMessage);
-//        mSocket.on("foodFriends",onPlace);
 
         foodOrigin = (Spinner) findViewById(R.id.food_types);
         adapter = ArrayAdapter.createFromResource(this, R.array.food_types, android.R.layout.simple_spinner_item);
@@ -204,19 +146,13 @@ public class SocketActivity extends AppCompatActivity {
         leaveGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mSocket.emit("leaveGroup",new PersonModel(connectionID,foodOrigin.getSelectedItem().toString(),currentPosition.latitude,currentPosition.longitude));
-//
-//                foodTypes.remove(foodOrigin.getSelectedItem().toString());
-//
-//                foodType = "";
-//                peopleAdapter.clear();
-//                peopleAdapter.notifyDataSetInvalidated();
+
 
                 Intent intent = new Intent();
                 intent.setAction(SocketService.MY_COMMAND);
 
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("person",new PersonModel("",foodOrigin.getSelectedItem().toString(),currentPosition.latitude,currentPosition.longitude));
+                bundle.putParcelable("person",new PersonModel("",foodOrigin.getSelectedItem().toString(),currentPosition.latitude,currentPosition.longitude,-1));
                 bundle.putInt("type",0);
                 intent.putExtras(bundle);
                 sendBroadcast(intent);
@@ -241,18 +177,10 @@ public class SocketActivity extends AppCompatActivity {
                     Toast.makeText(context,"Location unknown.Turn GPS on and wait for position lock.",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                PersonModel data = new PersonModel("",foodType,currentPosition.latitude,currentPosition.longitude);
+                PersonModel data = new PersonModel("",foodType,currentPosition.latitude,currentPosition.longitude, Integer.parseInt(UserPreferences.getPreference(SocketActivity.this,UserPreferences.USER_ID)));
                 System.out.println(data.toString());
 
 
-
-//                mSocket.emit("joinGroup", data , new Ack(){
-//
-//                    @Override
-//                    public void call(Object... args) {
-//                        guiToastNotify("Joined group.");
-//                    }
-//                });
 
                 Intent intent = new Intent();
                 intent.setAction(SocketService.MY_COMMAND);
@@ -311,8 +239,14 @@ public class SocketActivity extends AppCompatActivity {
                         guiNotifyUser(peoplesName);
                         break;
                     case 1:
+                        //result of connection getting connection ID from the server
                         String connectionID = intent.getStringExtra("ID");
                         guiToastNotify("Recieved id: "+connectionID);
+                        break;
+                    case 2:
+                        // ACK from the server, for group join and leave
+                        String response = intent.getStringExtra("response");
+                        guiToastNotify(response);
                         break;
                     case -7:
                         System.out.println("Invalid type, activity doesn't know what to do.");

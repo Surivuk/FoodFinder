@@ -5,6 +5,7 @@ import android.content.Context;
 import com.example.aleksandarx.foodfinder.data.model.FoodModel;
 import com.example.aleksandarx.foodfinder.data.sqlite.DBAdapter;
 import com.example.aleksandarx.foodfinder.data.sqlite.FoodTable;
+import com.example.aleksandarx.foodfinder.settings.Connections;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -29,15 +30,15 @@ import java.util.List;
  * Created by Darko on 27.06.2016.
  */
 public class HttpHelper {
-    private static String localServer = "http://192.168.1.7:8081/";
-    private static String herokuLive = "http://food-finder-app.herokuapp.com/";
-    private static String server = herokuLive;
+    //private static String localServer = "http://192.168.1.7:8081/";
+    //private static String herokuLive = localServer;//"http://food-finder-app.herokuapp.com/";
+    //private static String server = herokuLive;
     public static String signUpHeroku(String username,String password) {
         String retStr = "";
         HttpURLConnection conn = null;
         try {
 
-            conn = SetupConnection("http://food-finder-app.herokuapp.com/",10000,15000,"POST","application/json; charset=UTF-8","application/json");
+            conn = SetupConnection(Connections.liveServerURL,10000,15000,"POST","application/json; charset=UTF-8","application/json");
 
             //JSONObject holder = new JSONObject();
             JSONObject data = new JSONObject();
@@ -97,7 +98,7 @@ public class HttpHelper {
         HttpURLConnection conn = null;
         String ret = "ERROR";
         try {
-            conn = SetupConnection(herokuLive + "signinMobile", 10000, 15000, "POST","application/json; charset=UTF-8","application/json");
+            conn = SetupConnection(Connections.liveServerURL + "signinMobile", 10000, 15000, "POST","application/json; charset=UTF-8","application/json");
 
             JSONObject data = new JSONObject();
             data.put("username", username);
@@ -131,7 +132,7 @@ public class HttpHelper {
 
         HttpURLConnection conn = null;
         try {
-            conn = SetupConnection("http://food-finder-app.herokuapp.com/placesAround",10000,15000,"POST","application/json; charset=UTF-8","application/json");
+            conn = SetupConnection(Connections.liveServerURL+"placesAround",10000,15000,"POST","application/json; charset=UTF-8","application/json");
 
             JSONObject data = new JSONObject();
             data.put("lat", lat);
@@ -178,7 +179,7 @@ public class HttpHelper {
         HttpURLConnection conn = null;
         boolean ret = false;
         try {
-            conn = SetupConnection(herokuLive + "articlesMobile?id="+id, 10000, 15000, "POST", "-1", "application/json");
+            conn = SetupConnection(Connections.liveServerURL + "articlesMobile?id="+id, 10000, 15000, "POST", "-1", "application/json");
             //conn.setRequestProperty("id", id);
 
             OutputStream os = conn.getOutputStream();
@@ -226,7 +227,7 @@ public class HttpHelper {
                         model.addItem("mealType", json.getString("meal_type"));
                         model.addItem("articleDescription", json.getString("article_description"));
                         model.setDb_id(Long.parseLong(json.getString("article_id")));
-                        model.setArticle_image(herokuLive + "image?id=" + json.getString("article_id"));
+                        model.setArticle_image(Connections.liveServerURL + "image?id=" + json.getString("article_id"));
                         db.open();
                         db.insert(FoodTable.getTableName(), model);
                         db.close();
@@ -253,7 +254,7 @@ public class HttpHelper {
 
         try{
             HttpURLConnection httpUrlConnection = null;
-            URL url = new URL(herokuLive + "newFood");
+            URL url = new URL(Connections.liveServerURL + "newFood");
             httpUrlConnection = (HttpURLConnection) url.openConnection();
             httpUrlConnection.setUseCaches(false);
             httpUrlConnection.setDoOutput(true);
