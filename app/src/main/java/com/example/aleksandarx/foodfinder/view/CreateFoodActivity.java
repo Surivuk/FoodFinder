@@ -127,6 +127,7 @@ public class CreateFoodActivity extends AppCompatActivity {
                     PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
                     intentBuilder.setLatLngBounds(BOUNDS_MOUNTAIN_VIEW);
                     Intent intent = intentBuilder.build(CreateFoodActivity.this);
+                    //PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                     startActivityForResult(intent, PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
